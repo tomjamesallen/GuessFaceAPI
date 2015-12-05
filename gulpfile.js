@@ -1,6 +1,6 @@
 var gulp = require('gulp');
 
-var q = require('q');
+var Q = require('q');
 
 // Gulp needs to perform the following tasks.
 // * Create image variants
@@ -78,7 +78,10 @@ var processRound = function (roundData, i) {
     var questionData;
     if (questionData = getQuestionData(questionDir)) {
       questionData.questionId = questionId ++;
-      createQuestionsImages(questionDir, questionData, roundData);
+      console.log('calling createQuestionsImages', questionData.questionId);
+      createQuestionsImages(questionDir, questionData, roundData).then(function () {
+        console.log('all returned round', questionData.questionId);
+      });
       roundData.questionsData.push(questionData);
     }
   });
@@ -103,10 +106,16 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
   var distDir = 'round' + roundData.roundId + '-question' + questionData.questionId;
   distDir = './dist/api/imgs/' + distDir;
   var questionDir = './src/questions/' + questionDir;
+  var promises = [];
   ['a', 'b', 'mix'].forEach(function (imgName) {
     var path = questionDir + '/' + imgName;
-    var imgData = createImageVariants(path, distDir);
+    // var imgData = createImageVariants(path, distDir);
+    promises.push(createImageVariants(path, distDir).then(function (metadata) {
+      console.log('metadata returned');
+    }));
   });
+
+  return Q.all(promises);
 
   // console.log(questionDir, questionData, roundData);
   // var aPath = 
@@ -115,6 +124,8 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
 
 
 var createImageVariants = function (imgPath, distDir) {
+  var deferred = Q.defer();
+
   // Dependencies.
   var im = require('imagemagick');
   var fs = require('fs');
@@ -124,14 +135,17 @@ var createImageVariants = function (imgPath, distDir) {
   // We need to check for the both JPG and PNGs that match the file path.
   try {
     im.identify(imgPath + '.png', function(err, metadata){
-      console.log('metadata', metadata);
+      // console.log('metadata', metadata);
       if (typeof metadata !== 'undefined') {
-
+        deferred.resolve(metadata);
+      }
+      else {
+        deferred.reject(new Error('No metadata'));
       }
     });
   }
   catch (e) {
-    console.log(e);
+    deferred.reject(new Error(e));
   }
   
   
@@ -145,6 +159,8 @@ var createImageVariants = function (imgPath, distDir) {
   // });
 
   // console.log('after error');
+
+  return deferred.promise;
 };
 
 
