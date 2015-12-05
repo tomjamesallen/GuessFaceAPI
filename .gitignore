@@ -1,0 +1,4 @@
+node_modules
+# Excluding questions for development.
+*.png
+*.jpg
