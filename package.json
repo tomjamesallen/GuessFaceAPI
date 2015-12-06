@@ -9,6 +9,7 @@
   "author": "tom allen <tomjamesallenweb@gmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "extend": "^3.0.0",
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-browserify": "^0.5.1",
