@@ -258,8 +258,6 @@ var createImageVariants = function (imgPath, distDir, imgName, roundData, questi
   // On both PNG and JPG promises returning call function to create each of the
   // images variants.
   Q.allSettled([foundImg['png'].promise, foundImg['jpg'].promise]).then(function () {
-
-    imageProcessComplete.resolve();
     
     var imageVariantPromises = [];
 
@@ -268,7 +266,7 @@ var createImageVariants = function (imgPath, distDir, imgName, roundData, questi
     });
 
     Q.allSettled(imageVariantPromises).then(function () {
-      console.log('all image variants processed.');
+      imageProcessComplete.resolve();
     });
   });
 
@@ -312,11 +310,10 @@ var createImageVariant = function (srcImg, outputDir, size) {
       }
 
       fs.writeFileSync(outputFileName, stdout, 'binary');
+      variantProcessed.resolve();
     });
-
   });
 
-  variantProcessed.resolve();
 
   return variantProcessed.promise;
 };
