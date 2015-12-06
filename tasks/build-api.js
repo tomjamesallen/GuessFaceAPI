@@ -1,10 +1,14 @@
 var gulp = require('gulp');
 var Q = require('q');
-var extend = require("extend");
+var extend = require('extend');
+
+var im = require('imagemagick');
+var fs = require('fs');
 
 var defaults = {
   imageOutputDir : "dist/api/imgs",
-  imgSizes: [320, 640, 960, 1280, 1920]
+  imgSizes: [320, 640, 960, 1280, 1920],
+  imgFormat: 'jpg'
 };
 
 var config = extend({}, defaults, require('../build-api-config.json'));
@@ -75,11 +79,11 @@ var processRound = function (roundData, i) {
 
       // Request and save promise for question images.
       questionPromises.push(createQuestionsImages(questionDir, questionData, roundData));
-
-      // Delete initial questions data as this should not be output.
-      delete roundData.questions;
     }
   });
+
+  // Delete initial questions data as this should not be output.
+  delete roundData.questions;
   
   // Return the allSettled promise.
   return Q.allSettled(questionPromises);
@@ -118,7 +122,7 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
   // imgPath.
 
   // The directory to save output images to.
-  var distDir = '../' + config.imageOutputDir + '/' + 
+  var distDir = './' + config.imageOutputDir + '/' + 
       'round' + roundData.roundId + 
       '-question' + questionData.questionId;
   
@@ -145,14 +149,12 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
 
     // Call function to create image variants. When it returns save imgsData to
     // questionData.
-    createImageVariants(path, distDir).then(function (imgsData) {
+    createImageVariants(path, distDir, imgName).then(function (imgsData) {
       questionData.imgs[imgName] = imgsData;
       imgReady.resolve();
-      console.log('resolve imgReady');
     })
   });
 
-  console.log('Q.allSettled', Q.allSettled(imgPromises));
 
   // Return a promise for all imgPromises being settled.
   return Q.allSettled(imgPromises);
@@ -164,13 +166,10 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
  * Returns a promise.
  * @return promise
  */
-var createImageVariants = function (imgPath, distDir) {
+var createImageVariants = function (imgPath, distDir, imgName) {
+
   // Create promise.
   var imageProcessComplete = Q.defer();
-
-  // Dependencies.
-  var im = require('imagemagick');
-  var fs = require('fs');
 
   // We need to identify the source image by checking for both PNG and JPG and
   // then creating all of the image variants.
@@ -189,12 +188,18 @@ var createImageVariants = function (imgPath, distDir) {
   // Repeat for both PNG and JPG.
   ['png', 'jpg'].forEach(function (imgType) {
     try {
+      // Create full img path including extension.
       var imgFilePath = imgPath + '.' + imgType;
+
+      // Use image magick to identify the file and return the metadata.
       im.identify(imgFilePath, function(err, metadata){
+
+        // If metadata found then save and resolve promise.
         if (typeof metadata !== 'undefined') {
-          foundImg[imgType].resolve(metadata);
+          foundImg[imgType].resolve();
           imgFileData.metadata = metadata;
           imgFileData.path = imgFilePath;
+          imgFileData.imgName = imgName;
         }
         else {
           foundImg[imgType].reject(new Error('No metadata'));
@@ -206,38 +211,60 @@ var createImageVariants = function (imgPath, distDir) {
     }
   });
 
-  // Q.allSettled([foundImg['png'].promise, foundImg['jpg'].promise]).then(function () {
-  //   console.log('png and jpg returned');
-  //   var imageVariantPromises = [];
+  // On both PNG and JPG promises returning call function to create each of the
+  // images variants.
+  Q.allSettled([foundImg['png'].promise, foundImg['jpg'].promise]).then(function () {
 
-  //   config.imgSize.forEach(function (size) {
-  //     imageVariantPromises.push(createImageVariant(imgFileData, distDir, size));
-  //   });
+    imageProcessComplete.resolve();
+    
+    var imageVariantPromises = [];
 
-  //   Q.allSettled(imageVariantPromises).then(function () {
-  //     console.log('all image variants processed.');
+    config.imgSizes.forEach(function (size) {
+      imageVariantPromises.push(createImageVariant(imgFileData, distDir, size));
+    });
+
+    Q.allSettled(imageVariantPromises).then(function () {
+      console.log('all image variants processed.');
       
-  //   });
+    });
+  });
 
-
-  // });
-
-  imageProcessComplete.resolve();
-
+  // Return the imageProcessComplete promise.
   return imageProcessComplete.promise;
 };
 
+/**
+ * Create a single image variant.
+ * 
+ * Returns a promise.
+ * @return promise
+ */
 var createImageVariant = function (srcImg, distDir, size) {
+  // Create promise for variant.
   var variantProcessed = Q.defer();
+  
+  // Get img data.
+  var imgData = fs.readFileSync(srcImg.path, 'binary');
 
-  // im.resize({
-  //   srcData: fs.readFileSync('kittens.jpg', 'binary'),
-  //   width:   256
-  // }, function(err, stdout, stderr){
-  //   if (err) throw err
-  //   fs.writeFileSync('kittens-resized.jpg', stdout, 'binary');
-  //   console.log('resized kittens.jpg to fit within 256x256px')
-  // });
+  // Create output file name.
+  var outputFileName = distDir + 
+      srcImg.imgName + '_' + size +
+      '.' + config.imgFormat;
+
+  // Resize img to size.
+  im.resize({
+    srcData: imgData,
+    width: size,
+    format: config.imgFormat
+  }, function(err, stdout, stderr) {
+    
+    if (err) {
+      variantProcessed.reject(new Error(err));
+      return;
+    }
+
+    fs.writeFileSync(outputFileName, stdout, 'binary');
+  });
 
   variantProcessed.resolve();
 
