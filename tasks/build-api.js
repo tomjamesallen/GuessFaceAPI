@@ -7,11 +7,50 @@ var fs = require('fs');
 
 var defaults = {
   imageOutputDir : "dist/api/imgs",
-  imgSizes: [320, 640, 960, 1280, 1920],
+  imgSizes: [320, 640, 960],
   imgFormat: 'jpg'
 };
 
 var config = extend({}, defaults, require('../build-api-config.json'));
+
+// Helper (move to another file)
+var path = require('path');
+fs.mkdirParent = function(dirPath, mode, callback) {
+
+  if (typeof mode === 'function') {
+    callback = mode;
+    mode = undefined;
+  }
+
+  //Call the standard fs.mkdir
+  fs.mkdir(dirPath, mode, function(error) {
+    //When it fail in this way, do the custom steps
+    if (error && error.errno === -2) {
+      //Create all the parents recursively
+      fs.mkdirParent(path.dirname(dirPath), mode, callback);
+      //And then the directory
+      fs.mkdirParent(dirPath, mode, callback);
+    }
+    //Manually run the callback since we used our own callback to do all these
+    callback && callback(error);
+  });
+};
+
+// Another helper.
+var fs = require('fs');
+var deleteFolderRecursive = function(path) {
+  if( fs.existsSync(path) ) {
+    fs.readdirSync(path).forEach(function(file,index){
+      var curPath = path + "/" + file;
+      if(fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};
 
 /**
  * Top level function for building API.
@@ -24,6 +63,9 @@ var buildApiMaster = function () {
   
   // Create empty array to store promises for round data.
   var roundPromises = [];
+
+  // Delete previous imgs folder.
+  deleteFolderRecursive('./' + config.imageOutputDir, 'force');
 
   // Cycle over rounds in questionsData.
   questionsData.forEach(function (roundData, i) {
@@ -122,10 +164,8 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
   // imgPath.
 
   // The directory to save output images to.
-  var distDir = './' + config.imageOutputDir + '/' + 
-      'round' + roundData.roundId + 
-      '-question' + questionData.questionId;
-  
+  var distDir = './' + config.imageOutputDir;
+
   // Prepend src/questions path to the questionDir.
   var questionImgDir = './src/questions/' + questionDir;
   
@@ -149,7 +189,7 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
 
     // Call function to create image variants. When it returns save imgsData to
     // questionData.
-    createImageVariants(path, distDir, imgName).then(function (imgsData) {
+    createImageVariants(path, distDir, imgName, roundData, questionData).then(function (imgsData) {
       questionData.imgs[imgName] = imgsData;
       imgReady.resolve();
     })
@@ -166,7 +206,7 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
  * Returns a promise.
  * @return promise
  */
-var createImageVariants = function (imgPath, distDir, imgName) {
+var createImageVariants = function (imgPath, distDir, imgName, roundData, questionData) {
 
   // Create promise.
   var imageProcessComplete = Q.defer();
@@ -179,6 +219,10 @@ var createImageVariants = function (imgPath, distDir, imgName) {
     png: Q.defer(),
     jpg: Q.defer()
   };
+
+  var outputDir = distDir + '/' + 
+      'round-' + roundData.roundId + '/' + 
+      'question-' + questionData.questionId;
 
   // Create placeholder var for metadata.
   var imgFileData = {
@@ -220,12 +264,11 @@ var createImageVariants = function (imgPath, distDir, imgName) {
     var imageVariantPromises = [];
 
     config.imgSizes.forEach(function (size) {
-      imageVariantPromises.push(createImageVariant(imgFileData, distDir, size));
+      imageVariantPromises.push(createImageVariant(imgFileData, outputDir, size));
     });
 
     Q.allSettled(imageVariantPromises).then(function () {
       console.log('all image variants processed.');
-      
     });
   });
 
@@ -239,31 +282,38 @@ var createImageVariants = function (imgPath, distDir, imgName) {
  * Returns a promise.
  * @return promise
  */
-var createImageVariant = function (srcImg, distDir, size) {
+var createImageVariant = function (srcImg, outputDir, size) {
   // Create promise for variant.
   var variantProcessed = Q.defer();
   
   // Get img data.
   var imgData = fs.readFileSync(srcImg.path, 'binary');
 
-  // Create output file name.
-  var outputFileName = distDir + 
-      srcImg.imgName + '_' + size +
-      '.' + config.imgFormat;
+  var outputDir = outputDir + '/' + srcImg.imgName;
 
-  // Resize img to size.
-  im.resize({
-    srcData: imgData,
-    width: size,
-    format: config.imgFormat
-  }, function(err, stdout, stderr) {
-    
-    if (err) {
-      variantProcessed.reject(new Error(err));
-      return;
-    }
+  // Create specific directory.
+  fs.mkdirParent(outputDir, function () {
 
-    fs.writeFileSync(outputFileName, stdout, 'binary');
+    // Create output file name.
+    var outputFileName = outputDir + '/' +
+        srcImg.imgName + '_' + size +
+        '.' + config.imgFormat;
+
+    // Resize img to size.
+    im.resize({
+      srcData: imgData,
+      width: size,
+      format: config.imgFormat
+    }, function(err, stdout, stderr) {
+      
+      if (err) {
+        variantProcessed.reject(new Error(err));
+        return;
+      }
+
+      fs.writeFileSync(outputFileName, stdout, 'binary');
+    });
+
   });
 
   variantProcessed.resolve();
