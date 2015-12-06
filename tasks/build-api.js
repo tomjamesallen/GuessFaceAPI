@@ -15,73 +15,157 @@ var config = extend({}, defaults, require('../build-api-config.json'));
  * Generates JSON API and image variants.
  */
 var buildApiMaster = function () {
+  // Require master question data file from src.
   var questionsData = require('../src/questions/index.json');
+  
+  // Create empty array to store promises for round data.
   var roundPromises = [];
+
+  // Cycle over rounds in questionsData.
   questionsData.forEach(function (roundData, i) {
+    // Add the promise returned from processRound to the roundPromises array.
     roundPromises.push(processRound(roundData, i));
   });
 
-  roundPromises.allSettled(function () {
+  // Wait for all roundPromises to be settled, then save API data to output
+  // JSON file.
+  Q.allSettled(roundPromises).then(function () {
     var apiData = {
       rounds: questionsData
     };
 
+    console.log('saving JSON');
     saveJsonApi(apiData);
   });  
 };
 
+/**
+ * Process the data for a round.
+ * 
+ * Returns a promise.
+ * @return promise
+ */
 var processRound = function (roundData, i) {
+  // Create empty array for question promises.
+  var questionPromises = [];
+
+  // Add the roundId to the roundData.
   roundData.roundId = i;
+
+  // Create an empty array for the questionsData.
   roundData.questionsData = [];
 
+  // Set initial questionId.
   var questionId = 0;
 
+  // Cycle over questions in round.
   roundData.questions.forEach(function (questionDir, i) {
+
+    // Declare questionData var here.
     var questionData;
+
+    // Check for and set question data.
     if (questionData = getQuestionData(questionDir)) {
+
+      // Set questionId property on questionData.
       questionData.questionId = questionId ++;
-      createQuestionsImages(questionDir, questionData, roundData).then(function (response) {
-        
-      });
+
+      // Push question data to questionsData arrday on roundData.
       roundData.questionsData.push(questionData);
+
+      // Request and save promise for question images.
+      questionPromises.push(createQuestionsImages(questionDir, questionData, roundData));
+
+      // Delete initial questions data as this should not be output.
+      delete roundData.questions;
     }
   });
-  delete roundData.questions;
+  
+  // Return the allSettled promise.
+  return Q.allSettled(questionPromises);
 };
 
+/**
+ * Get inidividual question data.
+ *
+ * Returns object or null.
+ * @return object
+ */
 var getQuestionData = function (questionDir) {
+  // Set initial questionData var.
   var questionData = null;
+  
+  // Try a require and console.log any error.
   try {
     questionData = require('../src/questions/' + questionDir + '/index.json');
   }
   catch (e) {
-    // console.log(e);
+    console.log(new Error(e));
   }
   return questionData;
 };
 
+/**
+ * Create the images for a given question.
+ * 
+ * Returns a promise.
+ * @return promise
+ */
 var createQuestionsImages = function (questionDir, questionData, roundData) {
+
   // Check for and then create variants for each of the three images: a, b, mix.
   // Any of the images could be JPGs or PNGs so exclude the extension from the
   // imgPath.
-  var distDir = 'round' + roundData.roundId + '-question' + questionData.questionId;
-  distDir = '../' + config.imageOutputDir + '/' + distDir;
+
+  // The directory to save output images to.
+  var distDir = '../' + config.imageOutputDir + '/' + 
+      'round' + roundData.roundId + 
+      '-question' + questionData.questionId;
+  
+  // Prepend src/questions path to the questionDir.
   var questionImgDir = './src/questions/' + questionDir;
   
-  var promises = [];
+  // Create empty array for imgPromises.
+  var imgPromises = [];
+  
+  // Create empty object for imgs question data.
   questionData.imgs = {};
+
+  // Repeat process for a, b and mix images.
   ['a', 'b', 'mix'].forEach(function (imgName) {
+
+    // Create the image path.
     var path = questionImgDir + '/' + imgName;
-    promises.push(createImageVariants(path, distDir).then(function (metadata) {
-      questionData.imgs[imgName] = metadata;
-    }));
+
+    // Create an imgReady promise.
+    var imgReady = Q.defer();
+
+    // Push the promise to the imgPromises array.
+    imgPromises.push(imgReady.promise);
+
+    // Call function to create image variants. When it returns save imgsData to
+    // questionData.
+    createImageVariants(path, distDir).then(function (imgsData) {
+      questionData.imgs[imgName] = imgsData;
+      imgReady.resolve();
+      console.log('resolve imgReady');
+    })
   });
 
-  return Q.allSettled(promises);
+  console.log('Q.allSettled', Q.allSettled(imgPromises));
+
+  // Return a promise for all imgPromises being settled.
+  return Q.allSettled(imgPromises);
 };
 
-
+/**
+ * Create image variants
+ * 
+ * Returns a promise.
+ * @return promise
+ */
 var createImageVariants = function (imgPath, distDir) {
+  // Create promise.
   var imageProcessComplete = Q.defer();
 
   // Dependencies.
@@ -122,20 +206,30 @@ var createImageVariants = function (imgPath, distDir) {
     }
   });
 
-  Q.allSettled([foundImg['png'].promise, foundImg['jpg'].promise]).then(function () {
-    // console.log('png and jpg returned', imgFileData);
+  // Q.allSettled([foundImg['png'].promise, foundImg['jpg'].promise]).then(function () {
+  //   console.log('png and jpg returned');
+  //   var imageVariantPromises = [];
 
-    config.imgSize.forEach(function (size) {
+  //   config.imgSize.forEach(function (size) {
+  //     imageVariantPromises.push(createImageVariant(imgFileData, distDir, size));
+  //   });
 
-    });
+  //   Q.allSettled(imageVariantPromises).then(function () {
+  //     console.log('all image variants processed.');
+      
+  //   });
 
-    imageProcessComplete.resolve({'all img data' : 'ahaha'});
-  });
+
+  // });
+
+  imageProcessComplete.resolve();
 
   return imageProcessComplete.promise;
 };
 
 var createImageVariant = function (srcImg, distDir, size) {
+  var variantProcessed = Q.defer();
+
   // im.resize({
   //   srcData: fs.readFileSync('kittens.jpg', 'binary'),
   //   width:   256
@@ -144,6 +238,10 @@ var createImageVariant = function (srcImg, distDir, size) {
   //   fs.writeFileSync('kittens-resized.jpg', stdout, 'binary');
   //   console.log('resized kittens.jpg to fit within 256x256px')
   // });
+
+  variantProcessed.resolve();
+
+  return variantProcessed.promise;
 };
 
 var saveJsonApi = function (data) {

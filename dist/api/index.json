@@ -22,16 +22,19 @@
     },
     {
       "title": "Guess Face 2014",
+      "questions": [],
       "roundId": 1,
       "questionsData": []
     },
     {
       "title": "Guess Face 2014 (Bonus)",
+      "questions": [],
       "roundId": 2,
       "questionsData": []
     },
     {
       "title": "Guess Face 2015",
+      "questions": [],
       "roundId": 3,
       "questionsData": []
     }
