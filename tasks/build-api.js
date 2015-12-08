@@ -175,8 +175,12 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
   // Create empty object for imgs question data.
   questionData.imgs = {};
 
+  var imgKeys = ['a', 'b', 'mix'];
+
+  var tempImgsData = {};
+
   // Repeat process for a, b and mix images.
-  ['a', 'b', 'mix'].forEach(function (imgName) {
+  imgKeys.forEach(function (imgName) {
 
     // Create the image path.
     var path = questionImgDir + '/' + imgName;
@@ -189,10 +193,17 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
 
     // Call function to create image variants. When it returns save imgsData to
     // questionData.
-    createImageVariants(path, distDir, imgName, roundData, questionData).then(function (imgsData) {
-      questionData.imgs[imgName] = imgsData;
-      imgReady.resolve();
+    createImageVariants(path, distDir, imgName, roundData, questionData).then(function (imageVariantsData) {
+      tempImgsData[imgName] = imageVariantsData;
+      imgReady.resolve(questionData);
     })
+  });
+
+  Q.allSettled(imgPromises).then(function () {
+    imgKeys.forEach(function (imgName) {
+      if (!tempImgsData[imgName]) return;
+      questionData.imgs[imgName] = tempImgsData[imgName];
+    });
   });
 
 
@@ -255,6 +266,8 @@ var createImageVariants = function (imgPath, distDir, imgName, roundData, questi
     }
   });
 
+  var imageVariantsData = {};
+
   // On both PNG and JPG promises returning call function to create each of the
   // images variants.
   Q.allSettled([foundImg['png'].promise, foundImg['jpg'].promise]).then(function () {
@@ -262,11 +275,15 @@ var createImageVariants = function (imgPath, distDir, imgName, roundData, questi
     var imageVariantPromises = [];
 
     config.imgSizes.forEach(function (size) {
-      imageVariantPromises.push(createImageVariant(imgFileData, outputDir, size));
+      var imageVariantPromise = createImageVariant(imgFileData, outputDir, size);
+      imageVariantPromise.then(function (fileName) {
+        imageVariantsData[size] = fileName;
+      });
+      imageVariantPromises.push(imageVariantPromise);
     });
 
     Q.allSettled(imageVariantPromises).then(function () {
-      imageProcessComplete.resolve();
+      imageProcessComplete.resolve(imageVariantsData);
     });
   });
 
@@ -310,7 +327,7 @@ var createImageVariant = function (srcImg, outputDir, size) {
       }
 
       fs.writeFileSync(outputFileName, stdout, 'binary');
-      variantProcessed.resolve();
+      variantProcessed.resolve(outputFileName);
     });
   });
 

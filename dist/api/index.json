@@ -9,14 +9,46 @@
           "b": "Cat",
           "extra": "Will IAMS Cat",
           "questionId": 0,
-          "imgs": {}
+          "imgs": {
+            "a": {
+              "320": "./dist/api/imgs/round-0/question-0/a/a_320.jpg",
+              "640": "./dist/api/imgs/round-0/question-0/a/a_640.jpg",
+              "960": "./dist/api/imgs/round-0/question-0/a/a_960.jpg"
+            },
+            "b": {
+              "320": "./dist/api/imgs/round-0/question-0/b/b_320.jpg",
+              "640": "./dist/api/imgs/round-0/question-0/b/b_640.jpg",
+              "960": "./dist/api/imgs/round-0/question-0/b/b_960.jpg"
+            },
+            "mix": {
+              "320": "./dist/api/imgs/round-0/question-0/mix/mix_320.jpg",
+              "640": "./dist/api/imgs/round-0/question-0/mix/mix_640.jpg",
+              "960": "./dist/api/imgs/round-0/question-0/mix/mix_960.jpg"
+            }
+          }
         },
         {
           "a": "Woody Alan",
           "b": "Alan Rickman",
           "extra": "Woody Alan Rickman",
           "questionId": 1,
-          "imgs": {}
+          "imgs": {
+            "a": {
+              "320": "./dist/api/imgs/round-0/question-1/a/a_320.jpg",
+              "640": "./dist/api/imgs/round-0/question-1/a/a_640.jpg",
+              "960": "./dist/api/imgs/round-0/question-1/a/a_960.jpg"
+            },
+            "b": {
+              "320": "./dist/api/imgs/round-0/question-1/b/b_320.jpg",
+              "640": "./dist/api/imgs/round-0/question-1/b/b_640.jpg",
+              "960": "./dist/api/imgs/round-0/question-1/b/b_960.jpg"
+            },
+            "mix": {
+              "320": "./dist/api/imgs/round-0/question-1/mix/mix_320.jpg",
+              "640": "./dist/api/imgs/round-0/question-1/mix/mix_640.jpg",
+              "960": "./dist/api/imgs/round-0/question-1/mix/mix_960.jpg"
+            }
+          }
         }
       ]
     },
