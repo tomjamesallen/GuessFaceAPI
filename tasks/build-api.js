@@ -60,6 +60,10 @@ var deleteFolderRecursive = function(path) {
 var buildApiMaster = function () {
   // Require master question data file from src.
   var questionsData = require('../src/questions/index.json');
+
+  var apiData = {
+    rounds: {}
+  };
   
   // Create empty array to store promises for round data.
   var roundPromises = [];
@@ -71,15 +75,14 @@ var buildApiMaster = function () {
   questionsData.forEach(function (roundData, i) {
     // Add the promise returned from processRound to the roundPromises array.
     roundPromises.push(processRound(roundData, i));
+
+    // Save round data to rounds object, keyed by roundId.
+    apiData.rounds[roundData.roundId] = roundData;
   });
 
   // Wait for all roundPromises to be settled, then save API data to output
   // JSON file.
   Q.allSettled(roundPromises).then(function () {
-    var apiData = {
-      rounds: questionsData
-    };
-
     console.log('saving JSON');
     saveJsonApi(apiData);
   });  
@@ -99,7 +102,7 @@ var processRound = function (roundData, i) {
   roundData.roundId = i;
 
   // Create an empty array for the questionsData.
-  roundData.questionsData = [];
+  roundData.questionsData = {};
 
   // Set initial questionId.
   var questionId = 0;
@@ -116,8 +119,14 @@ var processRound = function (roundData, i) {
       // Set questionId property on questionData.
       questionData.questionId = questionId ++;
 
+      // Save round data to question.
+      questionData.roundData = {
+        roundId: roundData.roundId,
+        title: roundData.title
+      };
+
       // Push question data to questionsData arrday on roundData.
-      roundData.questionsData.push(questionData);
+      roundData.questionsData[questionData.questionId] = questionData;
 
       // Request and save promise for question images.
       questionPromises.push(createQuestionsImages(questionDir, questionData, roundData));
@@ -327,7 +336,17 @@ var createImageVariant = function (srcImg, outputDir, size) {
       }
 
       fs.writeFileSync(outputFileName, stdout, 'binary');
-      variantProcessed.resolve(outputFileName);
+
+      // Get api file path.
+      var apiFilePath = outputFileName.split('dist/');
+      if (apiFilePath.length === 1) {
+        apiFilePath = apiFilePath[0];
+      }
+      else {
+        apiFilePath = '/' + apiFilePath[1];
+      }
+      
+      variantProcessed.resolve(apiFilePath);
     });
   });
 
