@@ -9,7 +9,13 @@ var livereload = require('gulp-livereload');
 
 gulp.task('compile:js', function () {
   return browserify(config.src, {
-      debug: true
+      debug: true,
+      shim: {
+        jQuery: {
+          path: './src/vendor/jquery-1.11.3.min.js',
+          exports: 'jQuery'
+        }
+      }
     })
     .transform(reactify)
     .bundle()

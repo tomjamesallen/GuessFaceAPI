@@ -3,13 +3,17 @@ body {
 }
 
 h1, h2, .heading {
-  color: red;
   font-family: 'Lobster', cursive;
 }
 
-h1 {
-  font-size: u(2);
-  line-height: 1.5;
+h1, h2, h3, h4, h5, h6, p {
   margin: 0;
-  margin-bottom: u(2);
+  padding: 0;
+}
+
+h1 {
+  font-size: u(3);
+  line-height: 1;
+  margin: 0;
+  margin-bottom: u(3);
 }
