@@ -8,10 +8,15 @@ var streamify = require('gulp-streamify');
 var livereload = require('gulp-livereload');
 
 gulp.task('compile:js', function () {
-
-  return browserify(config.src)
+  return browserify(config.src, {
+      debug: true
+    })
     .transform(reactify)
     .bundle()
+    .on('error', function (err) {
+      console.log(err);
+      this.emit('end');
+    })
     .pipe(source(config.outputFileName))
     .pipe(streamify(uglify()))
     .pipe(gulp.dest(config.outputDir))
