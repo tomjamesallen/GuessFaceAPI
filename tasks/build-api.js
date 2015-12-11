@@ -329,4 +329,12 @@ var saveJsonApi = function (data) {
   jsonfile.writeFileSync(file, data, {spaces: 2});
 };
 
+/**
+ * Gulp task.
+ */
+gulp.task('build-api', function () {
+  buildApiMaster();
+});
+
+// Export function for re-use.
 module.exports = buildApiMaster;

@@ -1,10 +1,12 @@
 var gulp = require('gulp');
 
+var requireDir = require('require-dir');
+requireDir('./tasks');
+
 // Gulp needs to perform the following tasks.
 // * Create image variants
 // * Output JSON API with image data and answers.
 // * Compile front end assets - JS / CSS (requires watch)
-// * Set up live reload
 // 
 // Directory structure is as follows:
 // - src/
@@ -37,10 +39,13 @@ var gulp = require('gulp');
 
 gulp.task('default', function () {
   console.log('running default');
+  
 });
 
-gulp.task('build-api', function () {
-  require('./tasks/build-api')();
+gulp.task('watch', ['watch:js']);
+
+gulp.task('compile-assets', function () {
+  console.log('compile assets.');
 });
 
 

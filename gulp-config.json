@@ -1,0 +1,10 @@
+{
+  "jsConfig": {
+    "jsSources": [
+      "src/js/main.js"
+    ],
+    "jsToWatch": [
+      "src/js/**"
+    ]
+  }
+}
