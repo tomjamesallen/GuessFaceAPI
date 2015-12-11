@@ -37,15 +37,12 @@ requireDir('./tasks');
 // Images variant can then be created and placed in the dist/api directory. The
 // image paths are saved and added to the data to be saved to api/index.json.
 
-gulp.task('default', function () {
-  console.log('running default');
-  
-});
+gulp.task('default', ['watch']);
 
-gulp.task('watch', ['watch:js', 'watch:html']);
+gulp.task('watch', ['watch:js', 'watch:html', 'watch:scss']);
 
 gulp.task('compile-assets', function () {
-  console.log('compile assets.');
+  gulp.start('compile:js', 'compile:html', 'compile:scss');
 });
 
 

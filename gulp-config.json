@@ -11,5 +11,13 @@
     "src": "./src/index.html",
     "outputFileName": "index.html",
     "outputDir": "./dist/"
+  },
+  "scss": {
+    "src": "./src/scss/main.scss",
+    "toWatch": [
+      "src/scss/**"
+    ],
+    "outputFileName": "main.css",
+    "outputDir": "./dist/css"
   }
 }

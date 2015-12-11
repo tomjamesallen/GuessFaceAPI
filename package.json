@@ -17,6 +17,7 @@
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-browserify": "^0.5.1",
+    "gulp-concat": "^2.6.0",
     "gulp-livereload": "^3.8.1",
     "gulp-minify-css": "^1.2.2",
     "gulp-minify-html": "^1.0.4",
@@ -35,6 +36,7 @@
     "react-router": "^1.0.2",
     "reactify": "^1.1.1",
     "require-dir": "^0.3.0",
+    "underscore": "^1.8.3",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
   }
