@@ -1,10 +1,10 @@
 {
   "jsConfig": {
-    "jsSources": [
-      "src/js/main.js"
-    ],
+    "jsSrc": "./src/js/app-main.js",
     "jsToWatch": [
       "src/js/**"
-    ]
+    ],
+    "outputFileName": "bundle.js",
+    "outputDir": "./dist/js"
   }
 }
