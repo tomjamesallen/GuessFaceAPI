@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    // "start": "open http://localhost:1212 & httpster -1212"
   },
   "author": "tom allen <tomjamesallenweb@gmail.com>",
   "license": "ISC",

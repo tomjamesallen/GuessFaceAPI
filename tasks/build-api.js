@@ -1,10 +1,15 @@
+// Require modules.
 var gulp = require('gulp');
 var Q = require('q');
 var extend = require('extend');
-
 var im = require('imagemagick');
 var fs = require('fs');
 
+// FS Helpers.
+fs.mkdirParent = require('./helpers/mkdirParent');
+fs.deleteFolderRecursive = require('./helpers/deleteFolderRecursive');
+
+// Var defaults object.
 var defaults = {
   imageOutputDir : "dist/api/imgs",
   imgSizes: [320, 640, 960],
@@ -12,45 +17,6 @@ var defaults = {
 };
 
 var config = extend({}, defaults, require('../build-api-config.json'));
-
-// Helper (move to another file)
-var path = require('path');
-fs.mkdirParent = function(dirPath, mode, callback) {
-
-  if (typeof mode === 'function') {
-    callback = mode;
-    mode = undefined;
-  }
-
-  //Call the standard fs.mkdir
-  fs.mkdir(dirPath, mode, function(error) {
-    //When it fail in this way, do the custom steps
-    if (error && error.errno === -2) {
-      //Create all the parents recursively
-      fs.mkdirParent(path.dirname(dirPath), mode, callback);
-      //And then the directory
-      fs.mkdirParent(dirPath, mode, callback);
-    }
-    //Manually run the callback since we used our own callback to do all these
-    callback && callback(error);
-  });
-};
-
-// Another helper.
-var fs = require('fs');
-var deleteFolderRecursive = function(path) {
-  if( fs.existsSync(path) ) {
-    fs.readdirSync(path).forEach(function(file,index){
-      var curPath = path + "/" + file;
-      if(fs.lstatSync(curPath).isDirectory()) { // recurse
-        deleteFolderRecursive(curPath);
-      } else { // delete file
-        fs.unlinkSync(curPath);
-      }
-    });
-    fs.rmdirSync(path);
-  }
-};
 
 /**
  * Top level function for building API.
@@ -69,7 +35,7 @@ var buildApiMaster = function () {
   var roundPromises = [];
 
   // Delete previous imgs folder.
-  deleteFolderRecursive('./' + config.imageOutputDir, 'force');
+  fs.deleteFolderRecursive('./' + config.imageOutputDir, 'force');
 
   // Cycle over rounds in questionsData.
   questionsData.forEach(function (roundData, i) {
@@ -354,6 +320,9 @@ var createImageVariant = function (srcImg, outputDir, size) {
   return variantProcessed.promise;
 };
 
+/**
+ * Save data to JSON.
+ */
 var saveJsonApi = function (data) {
   var jsonfile = require('jsonfile');
   var file = './dist/api/index.json';
