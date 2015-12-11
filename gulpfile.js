@@ -42,7 +42,7 @@ gulp.task('default', function () {
   
 });
 
-gulp.task('watch', ['watch:js']);
+gulp.task('watch', ['watch:js', 'watch:html']);
 
 gulp.task('compile-assets', function () {
   console.log('compile assets.');

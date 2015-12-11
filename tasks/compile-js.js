@@ -1,23 +1,25 @@
 var gulp = require('gulp');
-var config = require('../gulp-config.json').jsConfig;
+var config = require('../gulp-config.json').js;
 var browserify = require('browserify');
 var reactify = require('reactify');
 var source = require('vinyl-source-stream');
+var uglify = require('gulp-uglify');
+var streamify = require('gulp-streamify');
+var livereload = require('gulp-livereload');
 
-gulp.task('build:js', function () {
-  var bundler = browserify(config.jsSrc, {
+gulp.task('compile:js', function () {
 
-  });
-  bundler.transform(reactify);
-  // bundler.plugin('minifyify', {map: 'bundle.map.json'});
-  
-  var stream = bundler.bundle();
-  return stream
+  return browserify(config.src)
+    .transform(reactify)
+    .bundle()
     .pipe(source(config.outputFileName))
-    .pipe(gulp.dest(config.outputDir));
+    .pipe(streamify(uglify()))
+    .pipe(gulp.dest(config.outputDir))
+    .pipe(livereload());
 });
 
 gulp.task('watch:js', function () {
-  gulp.start('build:js');
-  gulp.watch(config.jsToWatch, ['build:js']);
+  livereload.listen();
+  gulp.start('compile:js');
+  gulp.watch(config.toWatch, ['compile:js']);
 });
