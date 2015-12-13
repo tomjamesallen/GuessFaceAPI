@@ -73,8 +73,10 @@ var processRound = function (roundData, i) {
   // Set initial questionId.
   var questionId = 0;
 
-  // Cycle over questions in round.
-  roundData.questions.forEach(function (questionDir, i) {
+  var forEachQuestion = function (questionDir, i, array, isExample) {
+
+    // Set default 'isExample'.
+    if (typeof isExample === 'undefined') isExample = false;
 
     // Declare questionData var here.
     var questionData;
@@ -82,8 +84,13 @@ var processRound = function (roundData, i) {
     // Check for and set question data.
     if (questionData = getQuestionData(questionDir)) {
 
-      // Set questionId property on questionData.
-      questionData.questionId = questionId ++;
+      if (!isExample) {
+        // Set questionId property on questionData.
+        questionData.questionId = questionId ++;
+      }
+      else {
+        questionData.questionId = 'q';
+      }
 
       // Save round data to question.
       questionData.roundData = {
@@ -91,16 +98,33 @@ var processRound = function (roundData, i) {
         title: roundData.title
       };
 
-      // Push question data to questionsData arrday on roundData.
-      roundData.questionsData[questionData.questionId] = questionData;
+      if (!isExample) {
+        // Push question data to questionsData array on roundData.
+        roundData.questionsData[questionData.questionId] = questionData;
+      }
+      else {
+        // Save example data to roundData.
+        roundData.exampleData = questionData;
+      } 
 
       // Request and save promise for question images.
       questionPromises.push(createQuestionsImages(questionDir, questionData, roundData));
     }
-  });
+  }
+
+  // Cycle over questions in round.
+  roundData.questions.forEach(forEachQuestion);
+
+  // Get example question.
+  if (roundData.example) {
+    forEachQuestion(roundData.example, 0, null, true);
+  }
 
   // Delete initial questions data as this should not be output.
   delete roundData.questions;
+
+  // Delete initia example field as this should not be output.
+  delete roundData.example;
   
   // Return the allSettled promise.
   return Q.allSettled(questionPromises);
