@@ -45,5 +45,7 @@ gulp.task('compile-assets', function () {
   gulp.start('compile:js', 'compile:html', 'compile:scss');
 });
 
+gulp.task('build', ['compile-assets', 'build-api']);
+
 
 

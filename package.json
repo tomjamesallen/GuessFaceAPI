@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prestart": "gulp compile-assets & gulp build-api",
+    "prestart": "gulp compile-assets",
     "start": "gulp watch & node dev-server.js"
   },
   "author": "tom allen <tomjamesallenweb@gmail.com>",

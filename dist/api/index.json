@@ -58,22 +58,121 @@
             }
           }
         }
+      },
+      "exampleData": {
+        "a": "Will.I.Am",
+        "b": "Cat",
+        "extra": "Will IAMS Cat",
+        "questionId": "e",
+        "roundData": {
+          "roundId": 0,
+          "title": "Guess Face 2012"
+        },
+        "imgs": {
+          "a": {
+            "320": "/api/imgs/round-0/question-e/a/a_320.jpg",
+            "640": "/api/imgs/round-0/question-e/a/a_640.jpg",
+            "960": "/api/imgs/round-0/question-e/a/a_960.jpg"
+          },
+          "b": {
+            "320": "/api/imgs/round-0/question-e/b/b_320.jpg",
+            "640": "/api/imgs/round-0/question-e/b/b_640.jpg",
+            "960": "/api/imgs/round-0/question-e/b/b_960.jpg"
+          },
+          "mix": {
+            "320": "/api/imgs/round-0/question-e/mix/mix_320.jpg",
+            "640": "/api/imgs/round-0/question-e/mix/mix_640.jpg",
+            "960": "/api/imgs/round-0/question-e/mix/mix_960.jpg"
+          }
+        }
       }
     },
     "1": {
       "title": "Guess Face 2014",
       "roundId": 1,
-      "questionsData": {}
-    },
-    "2": {
-      "title": "Guess Face 2014 (Bonus)",
-      "roundId": 2,
-      "questionsData": {}
-    },
-    "3": {
-      "title": "Guess Face 2015",
-      "roundId": 3,
-      "questionsData": {}
+      "questionsData": {
+        "0": {
+          "a": "Alexander Armstrong",
+          "b": "Ben Miller",
+          "extra": "Armstrong and Miller",
+          "questionId": 0,
+          "roundData": {
+            "roundId": 1,
+            "title": "Guess Face 2014"
+          },
+          "imgs": {
+            "a": {
+              "320": "/api/imgs/round-1/question-0/a/a_320.jpg",
+              "640": "/api/imgs/round-1/question-0/a/a_640.jpg",
+              "960": "/api/imgs/round-1/question-0/a/a_960.jpg"
+            },
+            "b": {
+              "320": "/api/imgs/round-1/question-0/b/b_320.jpg",
+              "640": "/api/imgs/round-1/question-0/b/b_640.jpg",
+              "960": "/api/imgs/round-1/question-0/b/b_960.jpg"
+            },
+            "mix": {
+              "320": "/api/imgs/round-1/question-0/mix/mix_320.jpg",
+              "640": "/api/imgs/round-1/question-0/mix/mix_640.jpg",
+              "960": "/api/imgs/round-1/question-0/mix/mix_960.jpg"
+            }
+          }
+        },
+        "1": {
+          "a": "Dawn French",
+          "b": "Jennifer Saunders",
+          "extra": "French and Saunders",
+          "questionId": 1,
+          "roundData": {
+            "roundId": 1,
+            "title": "Guess Face 2014"
+          },
+          "imgs": {
+            "a": {
+              "320": "/api/imgs/round-1/question-1/a/a_320.jpg",
+              "640": "/api/imgs/round-1/question-1/a/a_640.jpg",
+              "960": "/api/imgs/round-1/question-1/a/a_960.jpg"
+            },
+            "b": {
+              "320": "/api/imgs/round-1/question-1/b/b_320.jpg",
+              "640": "/api/imgs/round-1/question-1/b/b_640.jpg",
+              "960": "/api/imgs/round-1/question-1/b/b_960.jpg"
+            },
+            "mix": {
+              "320": "/api/imgs/round-1/question-1/mix/mix_320.jpg",
+              "640": "/api/imgs/round-1/question-1/mix/mix_640.jpg",
+              "960": "/api/imgs/round-1/question-1/mix/mix_960.jpg"
+            }
+          }
+        }
+      },
+      "exampleData": {
+        "a": "Stephen Fry",
+        "b": "Hugh Laurey",
+        "extra": "Fry and Laurey",
+        "questionId": "e",
+        "roundData": {
+          "roundId": 1,
+          "title": "Guess Face 2014"
+        },
+        "imgs": {
+          "a": {
+            "320": "/api/imgs/round-1/question-e/a/a_320.jpg",
+            "640": "/api/imgs/round-1/question-e/a/a_640.jpg",
+            "960": "/api/imgs/round-1/question-e/a/a_960.jpg"
+          },
+          "b": {
+            "320": "/api/imgs/round-1/question-e/b/b_320.jpg",
+            "640": "/api/imgs/round-1/question-e/b/b_640.jpg",
+            "960": "/api/imgs/round-1/question-e/b/b_960.jpg"
+          },
+          "mix": {
+            "320": "/api/imgs/round-1/question-e/mix/mix_320.jpg",
+            "640": "/api/imgs/round-1/question-e/mix/mix_640.jpg",
+            "960": "/api/imgs/round-1/question-e/mix/mix_960.jpg"
+          }
+        }
+      }
     }
   }
 }

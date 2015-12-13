@@ -4,24 +4,15 @@
     "questions" : [
       "williamscat",
       "2012/woody-alan-rickman"
-    ]
+    ],
+    "example" : "williamscat"
   },
   {
     "title" : "Guess Face 2014",
     "questions" : [
-      
-    ]
-  },
-  {
-    "title" : "Guess Face 2014 (Bonus)",
-    "questions" : [
-      
-    ]
-  },
-  {
-    "title" : "Guess Face 2015",
-    "questions" : [
-      
-    ]
+      "2014/Armstrong-and-Miller",
+      "2014/French-and-Saunders"
+    ],
+    "example" : "2014/Fry-and-Laurey"
   }
 ]

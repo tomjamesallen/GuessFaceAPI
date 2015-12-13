@@ -17,6 +17,7 @@ var defaults = {
   imgFormat: 'jpg'
 };
 
+// Get extend defaults with config in build-api-config.json.
 var config = extend({}, defaults, require('../build-api-config.json'));
 
 /**
@@ -58,8 +59,8 @@ var buildApiMaster = function () {
   // Wait for all roundPromises to be settled, then save API data to output
   // JSON file.
   Q.allSettled(roundPromises).then(function () {
-    console.log('saving JSON');
     saveJsonApi(apiData);
+    console.log('JSON saved to API.');
   });  
 };
 
@@ -98,6 +99,7 @@ var processRound = function (roundData, i) {
         questionDataTemp.questionId = questionId ++;
       }
       else {
+        // For example questions set question id to 'e'.
         questionDataTemp.questionId = 'e';
       }
 
@@ -107,11 +109,11 @@ var processRound = function (roundData, i) {
         title: roundData.title
       };
 
-      var questionDataReturned = createQuestionsImages(questionDir, questionDataTemp);
+      // Call createQuestionsImages and save promise.
+      var questionDataReturnedPromise = createQuestionsImages(questionDir, questionDataTemp);
 
-      questionDataReturned.then(function (questionData) {
-        // console.log("------------- \n questionDataReturned", questionData);
-        // console.log("------------- \n");
+      // Save question data on data returned promise returning.
+      questionDataReturnedPromise.then(function (questionData) {
 
         if (questionData.questionId !== 'e') {
           // Push question data to questionsData array on roundData.
@@ -124,7 +126,7 @@ var processRound = function (roundData, i) {
       });
 
       // Request and save promise for question images.
-      questionPromises.push(questionDataReturned);
+      questionPromises.push(questionDataReturnedPromise);
     }
   }
 
@@ -142,15 +144,17 @@ var processRound = function (roundData, i) {
   // Delete initia example field as this should not be output.
   delete roundData.example;
 
-  var roundReady = Q.defer();
+  // Create new promise for roundReady.
+  var roundReadyPromise = Q.defer();
 
+  // When all questionPromises are settled, resolve the roundReadyPromise,
+  // passing it the roundData.
   Q.allSettled(questionPromises).then(function () {
-    roundReady.resolve(roundData);
-    console.log('resolve round');
+    roundReadyPromise.resolve(roundData);
   });
   
   // Return the allSettled promise.
-  return roundReady.promise;
+  return roundReadyPromise.promise;
 };
 
 /**
@@ -181,15 +185,13 @@ var getQuestionData = function (questionDir) {
  */
 var createQuestionsImages = function (questionDir, questionDataTemp) {
 
-  var questionDataTemp = _.clone(questionDataTemp);
-
-  // all three questions run here, but when the promises return, they all return
-  // to the last question. This means that either a variable is being overriden
-  // or there is some scoping issue.
-
   // Check for and then create variants for each of the three images: a, b, mix.
   // Any of the images could be JPGs or PNGs so exclude the extension from the
   // imgPath.
+
+  // Clone the questionDataTemp input to un-link it form the original object,
+  // this prevents previous object options being overriden.
+  var questionDataTemp = _.clone(questionDataTemp);
 
   // The directory to save output images to.
   var distDir = './' + config.imageOutputDir;
@@ -211,48 +213,45 @@ var createQuestionsImages = function (questionDir, questionDataTemp) {
     var path = questionImgDir + '/' + imgName;
 
     // Create an imgReady promise.
-    var imgReady = Q.defer();
+    var imgReadyPromise = Q.defer();
 
     // Call function to create image variants. When it returns save imgsData to
     // questionData.
-    createImageVariants(path, distDir, imgName, questionDataTemp.roundData.roundId, questionDataTemp.questionId).then(function (imageVariantsData) {
-      tempImgsData[imgName] = imageVariantsData;
-      imgReady.resolve();
+    createImageVariants(path, distDir, imgName, questionDataTemp.roundData.roundId, questionDataTemp.questionId).then(function (imgVariantsData) {
+      
+      // Save the imgVariantData to tempImgsData, keyed by the imgName.
+      tempImgsData[imgName] = imgVariantsData;
+      // Resolve the imgReady promise.
+      imgReadyPromise.resolve();
     })
 
     // Push the promise to the imgPromises array.
-    imgPromises.push(imgReady.promise);
+    imgPromises.push(imgReadyPromise.promise);
   });
 
-  var allImgPromisesSettled = Q.defer();
+  // Create promise for all img promises being settled.
+  var allImgPromisesSettledPromise = Q.defer();
 
+  // Save imgData back to questionDat once all img promises have been settled.
   Q.allSettled(imgPromises).then(function () {
-    console.log("all settled ------------", "\n",
-      "tempImgsData \n",
-      tempImgsData, "\n",
-      "questionDataTemp", "\n",
-      questionDataTemp);
 
+    // Create object for imgs.
     questionDataTemp.imgs = {};
     
+    // For each of the image key, save the data to the questionData.
     imgKeys.forEach(function (imgName) {
       if (typeof tempImgsData[imgName] !== 'undefined') {
         questionDataTemp.imgs[imgName] = tempImgsData[imgName];
       }
     });
 
-    // console.log('tempImgsData', tempImgsData);
-    // console.log('questionDataTemp', questionDataTemp);
-    // console.log('--------------');
-
-    allImgPromisesSettled.resolve(questionDataTemp);
-
-    console.log('resolving createQuestionsImages');
+    // Once all data is saved, resolve the promise.
+    allImgPromisesSettledPromise.resolve(questionDataTemp);
   });
 
 
   // Return a promise for all imgPromises being settled.
-  return allImgPromisesSettled.promise;
+  return allImgPromisesSettledPromise.promise;
 };
 
 /**
@@ -264,17 +263,18 @@ var createQuestionsImages = function (questionDir, questionDataTemp) {
 var createImageVariants = function (imgPath, distDir, imgName, roundId, questionId) {
 
   // Create promise.
-  var imageProcessComplete = Q.defer();
+  var imgProcessComplete = Q.defer();
 
   // We need to identify the source image by checking for both PNG and JPG and
   // then creating all of the image variants.
-  // 
+
   // Create promises.
-  var foundImg = {
+  var foundImgPromises = {
     png: Q.defer(),
     jpg: Q.defer()
   };
 
+  // Build outputDir using roundId and questionId.
   var outputDir = distDir + '/' + 
       'round-' + roundId + '/' + 
       'question-' + questionId;
@@ -293,44 +293,61 @@ var createImageVariants = function (imgPath, distDir, imgName, roundId, question
 
         // If metadata found then save and resolve promise.
         if (typeof metadata !== 'undefined') {
-          foundImg[imgType].resolve();
+          
+          // Save the data we'll need to the imgFileData object.
           imgFileData.metadata = metadata;
           imgFileData.path = imgFilePath;
           imgFileData.imgName = imgName;
+
+          // Resolve the promise for this file type.
+          foundImgPromises[imgType].resolve();
         }
         else {
-          foundImg[imgType].reject(new Error('No metadata'));
+          // If no metadata is found reject the promise.
+          foundImgPromises[imgType].reject(new Error('No metadata'));
         }
       });
     }
     catch (e) {
-      foundImg[imgType].reject(new Error(e));
+      // If we have an error reject the promise.
+      foundImgPromises[imgType].reject(new Error(e));
     }
   });
 
-  var imageVariantsData = {};
+  // Create an empty object to store the image 
+  var imgVariantsData = {};
 
   // On both PNG and JPG promises returning call function to create each of the
   // images variants.
-  Q.allSettled([foundImg['png'].promise, foundImg['jpg'].promise]).then(function () {
+  Q.allSettled([foundImgPromises['png'].promise, foundImgPromises['jpg'].promise]).then(function () {
     
-    var imageVariantPromises = [];
+    // Create empty array for imgVariantPromises.
+    var imgVariantPromises = [];
 
+    // For each img size in the config call the createImageVariant function.
     config.imgSizes.forEach(function (size) {
+
+      // Save the promise returned by createImageVariant.
       var imageVariantPromise = createImageVariant(imgFileData, outputDir, size);
+      
+      // Save data on promise returning. 
       imageVariantPromise.then(function (fileName) {
-        imageVariantsData[size] = fileName;
+        imgVariantsData[size] = fileName;
       });
-      imageVariantPromises.push(imageVariantPromise);
+
+      // Push promise to imgVariantPromises array.
+      imgVariantPromises.push(imageVariantPromise);
     });
 
-    Q.allSettled(imageVariantPromises).then(function () {
-      imageProcessComplete.resolve(imageVariantsData);
+    // Once all imgVariant promises are settled, resolve the imgProcessComplete
+    // promise, passing it the imgVariantsData.
+    Q.allSettled(imgVariantPromises).then(function () {
+      imgProcessComplete.resolve(imgVariantsData);
     });
   });
 
-  // Return the imageProcessComplete promise.
-  return imageProcessComplete.promise;
+  // Return the imgProcessComplete promise.
+  return imgProcessComplete.promise;
 };
 
 /**
@@ -340,12 +357,14 @@ var createImageVariants = function (imgPath, distDir, imgName, roundId, question
  * @return promise
  */
 var createImageVariant = function (srcImg, outputDir, size) {
+  
   // Create promise for variant.
-  var variantProcessed = Q.defer();
+  var variantProcessedPromise = Q.defer();
   
   // Get img data.
   var imgData = fs.readFileSync(srcImg.path, 'binary');
 
+  // Build outputDir.
   var outputDir = outputDir + '/' + srcImg.imgName;
 
   // Create specific directory.
@@ -363,28 +382,32 @@ var createImageVariant = function (srcImg, outputDir, size) {
       format: config.imgFormat
     }, function(err, stdout, stderr) {
       
+      // Reject promise if im.resize returns an error.
       if (err) {
-        variantProcessed.reject(new Error(err));
+        variantProcessedPromise.reject(new Error(err));
         return;
       }
 
+      // Write output of im.resize to outputFileName.
       fs.writeFileSync(outputFileName, stdout, 'binary');
 
       // Get api file path.
       var apiFilePath = outputFileName.split('dist/');
       if (apiFilePath.length === 1) {
+        // Get filepath after dist/.
         apiFilePath = apiFilePath[0];
       }
       else {
         apiFilePath = '/' + apiFilePath[1];
       }
       
-      variantProcessed.resolve(apiFilePath);
+      // Resolve variant processed promise.
+      variantProcessedPromise.resolve(apiFilePath);
     });
   });
 
-
-  return variantProcessed.promise;
+  // Return variant processed promise.
+  return variantProcessedPromise.promise;
 };
 
 /**
