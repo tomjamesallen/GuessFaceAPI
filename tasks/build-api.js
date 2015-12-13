@@ -4,6 +4,7 @@ var Q = require('q');
 var extend = require('extend');
 var im = require('imagemagick');
 var fs = require('fs');
+var _ = require('underscore');
 
 // FS Helpers.
 fs.mkdirParent = require('./helpers/mkdirParent');
@@ -38,12 +39,20 @@ var buildApiMaster = function () {
   fs.deleteFolderRecursive('./' + config.imageOutputDir, 'force');
 
   // Cycle over rounds in questionsData.
-  questionsData.forEach(function (roundData, i) {
-    // Add the promise returned from processRound to the roundPromises array.
-    roundPromises.push(processRound(roundData, i));
+  questionsData.forEach(function (roundDataTemp, i) {
+    
+    // Promise returned by processRound.
+    var roundReturned = processRound(roundDataTemp, i);
 
-    // Save round data to rounds object, keyed by roundId.
-    apiData.rounds[roundData.roundId] = roundData;
+    // When roundReturned promise resolves save round data to API's rounds 
+    // propery.
+    roundReturned.then(function (roundData) {
+      // Save round data to rounds object, keyed by roundId.
+      apiData.rounds[roundData.roundId] = roundData;
+    });
+
+    // Add the promise returned from processRound to the roundPromises array.
+    roundPromises.push(roundReturned);
   });
 
   // Wait for all roundPromises to be settled, then save API data to output
@@ -79,36 +88,43 @@ var processRound = function (roundData, i) {
     if (typeof isExample === 'undefined') isExample = false;
 
     // Declare questionData var here.
-    var questionData;
+    var questionDataTemp;
 
     // Check for and set question data.
-    if (questionData = getQuestionData(questionDir)) {
+    if (questionDataTemp = getQuestionData(questionDir)) {
 
       if (!isExample) {
         // Set questionId property on questionData.
-        questionData.questionId = questionId ++;
+        questionDataTemp.questionId = questionId ++;
       }
       else {
-        questionData.questionId = 'q';
+        questionDataTemp.questionId = 'e';
       }
 
       // Save round data to question.
-      questionData.roundData = {
+      questionDataTemp.roundData = {
         roundId: roundData.roundId,
         title: roundData.title
       };
 
-      if (!isExample) {
-        // Push question data to questionsData array on roundData.
-        roundData.questionsData[questionData.questionId] = questionData;
-      }
-      else {
-        // Save example data to roundData.
-        roundData.exampleData = questionData;
-      } 
+      var questionDataReturned = createQuestionsImages(questionDir, questionDataTemp);
+
+      questionDataReturned.then(function (questionData) {
+        // console.log("------------- \n questionDataReturned", questionData);
+        // console.log("------------- \n");
+
+        if (questionData.questionId !== 'e') {
+          // Push question data to questionsData array on roundData.
+          roundData.questionsData[questionData.questionId] = questionData;
+        }
+        else {
+          // Save example data to roundData.
+          roundData.exampleData = questionData;
+        }
+      });
 
       // Request and save promise for question images.
-      questionPromises.push(createQuestionsImages(questionDir, questionData, roundData));
+      questionPromises.push(questionDataReturned);
     }
   }
 
@@ -125,9 +141,16 @@ var processRound = function (roundData, i) {
 
   // Delete initia example field as this should not be output.
   delete roundData.example;
+
+  var roundReady = Q.defer();
+
+  Q.allSettled(questionPromises).then(function () {
+    roundReady.resolve(roundData);
+    console.log('resolve round');
+  });
   
   // Return the allSettled promise.
-  return Q.allSettled(questionPromises);
+  return roundReady.promise;
 };
 
 /**
@@ -156,7 +179,13 @@ var getQuestionData = function (questionDir) {
  * Returns a promise.
  * @return promise
  */
-var createQuestionsImages = function (questionDir, questionData, roundData) {
+var createQuestionsImages = function (questionDir, questionDataTemp) {
+
+  var questionDataTemp = _.clone(questionDataTemp);
+
+  // all three questions run here, but when the promises return, they all return
+  // to the last question. This means that either a variable is being overriden
+  // or there is some scoping issue.
 
   // Check for and then create variants for each of the three images: a, b, mix.
   // Any of the images could be JPGs or PNGs so exclude the extension from the
@@ -170,9 +199,6 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
   
   // Create empty array for imgPromises.
   var imgPromises = [];
-  
-  // Create empty object for imgs question data.
-  questionData.imgs = {};
 
   var imgKeys = ['a', 'b', 'mix'];
 
@@ -187,27 +213,46 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
     // Create an imgReady promise.
     var imgReady = Q.defer();
 
-    // Push the promise to the imgPromises array.
-    imgPromises.push(imgReady.promise);
-
     // Call function to create image variants. When it returns save imgsData to
     // questionData.
-    createImageVariants(path, distDir, imgName, roundData, questionData).then(function (imageVariantsData) {
+    createImageVariants(path, distDir, imgName, questionDataTemp.roundData.roundId, questionDataTemp.questionId).then(function (imageVariantsData) {
       tempImgsData[imgName] = imageVariantsData;
-      imgReady.resolve(questionData);
+      imgReady.resolve();
     })
+
+    // Push the promise to the imgPromises array.
+    imgPromises.push(imgReady.promise);
   });
 
+  var allImgPromisesSettled = Q.defer();
+
   Q.allSettled(imgPromises).then(function () {
+    console.log("all settled ------------", "\n",
+      "tempImgsData \n",
+      tempImgsData, "\n",
+      "questionDataTemp", "\n",
+      questionDataTemp);
+
+    questionDataTemp.imgs = {};
+    
     imgKeys.forEach(function (imgName) {
-      if (!tempImgsData[imgName]) return;
-      questionData.imgs[imgName] = tempImgsData[imgName];
+      if (typeof tempImgsData[imgName] !== 'undefined') {
+        questionDataTemp.imgs[imgName] = tempImgsData[imgName];
+      }
     });
+
+    // console.log('tempImgsData', tempImgsData);
+    // console.log('questionDataTemp', questionDataTemp);
+    // console.log('--------------');
+
+    allImgPromisesSettled.resolve(questionDataTemp);
+
+    console.log('resolving createQuestionsImages');
   });
 
 
   // Return a promise for all imgPromises being settled.
-  return Q.allSettled(imgPromises);
+  return allImgPromisesSettled.promise;
 };
 
 /**
@@ -216,7 +261,7 @@ var createQuestionsImages = function (questionDir, questionData, roundData) {
  * Returns a promise.
  * @return promise
  */
-var createImageVariants = function (imgPath, distDir, imgName, roundData, questionData) {
+var createImageVariants = function (imgPath, distDir, imgName, roundId, questionId) {
 
   // Create promise.
   var imageProcessComplete = Q.defer();
@@ -231,13 +276,11 @@ var createImageVariants = function (imgPath, distDir, imgName, roundData, questi
   };
 
   var outputDir = distDir + '/' + 
-      'round-' + roundData.roundId + '/' + 
-      'question-' + questionData.questionId;
+      'round-' + roundId + '/' + 
+      'question-' + questionId;
 
   // Create placeholder var for metadata.
-  var imgFileData = {
-
-  };
+  var imgFileData = {};
 
   // Repeat for both PNG and JPG.
   ['png', 'jpg'].forEach(function (imgType) {
