@@ -95,20 +95,24 @@ var QuestionDisplay = React.createClass({
       <div className="question-wrapper">
         <h2>Question {question.humanId}</h2>
         <div className="a-wrapper">
-          <div className="img-wrapper img-wrapper-question" ref="imgA">
-            <Display if={imgs}><img src={imgA} /></Display>
-          </div>
-          <div className="img-wrapper img-wrapper-answer" ref="imgAMix" >
-            <Display if={imgs}><img src={imgAMix} /></Display>
+          <div className="imgs-wrapper">
+            <div className="img-wrapper img-wrapper-question" ref="imgA">
+              <Display if={imgs}><img src={imgA} /></Display>
+            </div>
+            <div className="img-wrapper img-wrapper-answer" ref="imgAMix" >
+              <Display if={imgs}><img src={imgAMix} /></Display>
+            </div>
           </div>
         </div>
 
         <div className="b-wrapper">
-          <div className="img-wrapper img-wrapper-question" ref="imgB">
-            <Display if={imgs}><img src={imgB} /></Display>
-          </div>
-          <div className="img-wrapper img-wrapper-answer" ref="imgBMix">
-            <Display if={imgs}><img src={imgBMix} /></Display>
+          <div className="imgs-wrapper">
+            <div className="img-wrapper img-wrapper-question" ref="imgB">
+              <Display if={imgs}><img src={imgB} /></Display>
+            </div>
+            <div className="img-wrapper img-wrapper-answer" ref="imgBMix">
+              <Display if={imgs}><img src={imgBMix} /></Display>
+            </div>
           </div>
         </div>
       </div>

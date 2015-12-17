@@ -4,6 +4,7 @@ var _ = require('underscore');
 
 var Display = require('./parts/Display');
 var QuestionsList = require('./parts/QuestionsList');
+var QuestionDisplay = require('./parts/QuestionDisplay');
 
 var RoundHome = React.createClass({
 
@@ -55,14 +56,24 @@ var RoundHome = React.createClass({
   render: function () {
     if (!this.state.round) return null;
     var round = this.state.round;
+    console.log(round, this);
+    var hasQuestionId = typeof this.props.params.questionId !== 'undefined';
+
+    // console.log('hasQuestionId', hasQuestionId);
+
+    // if (round.exampleData) {
+    //   var example = round.exampleData;
+    //   example.humanId = 'Example Question';
+    // }
+
     return (
       <div>
         <h1>Round {round.humanId}</h1>
 
-        <Display if={!this.props.children}>
-          <h2>Round home</h2>
-          
+        <Display if={!hasQuestionId}>
+          <h2>Round home</h2>          
         </Display>
+
 
         {this.props.children ? React.cloneElement(this.props.children, {state: this.props.state, emit: this.emit, round: round}) : null}
 
