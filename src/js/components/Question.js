@@ -7,6 +7,12 @@ var Question = React.createClass({
     history: React.PropTypes.object.isRequired
   },
 
+  getInitialState: function () {
+    return {
+      question: null,
+    }
+  },
+
   componentWillMount: function () {
     // Check that question exists, if not, redirect to round's home.
     // Check that round exists, if not, redirect to home.
@@ -34,15 +40,22 @@ var Question = React.createClass({
     else if(!questionFound) {
       this.context.history.pushState(null, '/round/' + roundId);
     }
+
+    if (roundFound && questionFound) {
+      var question = data.rounds[machineRoundId].questionsData[machineQuestionId];
+      question.humanId = question.questionId + 1;
+
+      this.setState({
+        question: question
+      });
+
+    }
   },
 
   componentDidMount: function () {
     // var router = this.context.router;
-    console.log('Question', this);
 
 
-
-    // this.context.history.pushState(null, '/round/2');
 
   },
 
@@ -51,15 +64,13 @@ var Question = React.createClass({
   },
 
   render: function () {
-    return <h2>Question</h2>;
-
-    // return (
-    //   <div>
-    //     {[{title: 'something'}, {title: 'another title'}].map(function (object, i) {
-    //       return <div>{object.title}</div>
-    //     })}
-    //   </div>
-    // );
+    if (!this.state.question) return null;
+    var question = this.state.question;
+    return (
+      <div className="question-wrapper">
+        <h2>Question {question.humanId}</h2>
+      </div>
+    );
   }
 });
 
