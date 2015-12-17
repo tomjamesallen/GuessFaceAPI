@@ -1,6 +1,7 @@
 var React = require('react');
 var Link = require('react-router').Link;
 var QuestionDisplay = require('./parts/QuestionDisplay');
+var PrevNext = require('./parts/PrevNext');
 
 var Question = React.createClass({
 
@@ -47,9 +48,9 @@ var Question = React.createClass({
       question.humanId = question.questionId + 1;
 
       this.setState({
-        question: question
+        question: question,
+        round: data.rounds[machineRoundId]
       });
-
     }
   },
 
@@ -64,8 +65,12 @@ var Question = React.createClass({
   render: function () {
     if (!this.state.question) return null;
     var question = this.state.question;
+    var round = this.state.round;
     return (
-      <QuestionDisplay question={question} />
+      <div>
+        <QuestionDisplay question={question} />
+        <PrevNext question={question} round={round} />
+      </div>
     );
   }
 });
