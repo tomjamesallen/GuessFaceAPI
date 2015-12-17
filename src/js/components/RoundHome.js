@@ -74,10 +74,10 @@ var RoundHome = React.createClass({
           <h2>Round home</h2>          
         </Display>
 
-
         {this.props.children ? React.cloneElement(this.props.children, {state: this.props.state, emit: this.emit, round: round}) : null}
 
-        <Link to={'/round/' + round.humanId + '/index'}>Round Index</Link>
+        <div><Link to={'/round/' + round.humanId + '/index'}>Round Index</Link></div>
+        <div><Link to={'/round/' + round.humanId + '/example'}>Round Example</Link></div>
       </div>
     );
   }
