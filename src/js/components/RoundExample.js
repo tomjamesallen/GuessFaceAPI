@@ -1,6 +1,7 @@
 var React = require('react');
 var QuestionsList = require('./parts/QuestionsList');
 var QuestionDisplay = require('./parts/QuestionDisplay');
+var Link = require('react-router').Link;
 
 var RoundExample = React.createClass({
 
@@ -25,7 +26,9 @@ var RoundExample = React.createClass({
       question.humanId = 'Example Question';
       
       this.setState({
-        question: question
+        question: question,
+        roundId: roundId,
+        round: data.rounds[machineRoundId]
       });
     }
   },
@@ -33,8 +36,18 @@ var RoundExample = React.createClass({
   render: function () {
     if (!this.state.question) return null;
     var question = this.state.question;
+    var round = this.state.round;
+    var link = '/';
+
+    if (typeof round.questionsData[0] !== 'undefined') {
+      link = '/round/' + this.state.roundId + '/question/1';
+    }
+    
     return (
-      <QuestionDisplay question={question} />
+      <div>
+        <QuestionDisplay question={question} />
+        <Link to={link}>Start Round</Link>
+      </div>
     );
   }
 });
