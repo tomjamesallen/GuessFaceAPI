@@ -2,6 +2,7 @@ var React = require('react');
 var Router = require('react-router');
 var $ = require('../vendor/jquery-1.11.3.min.js');
 var Display = require('./parts/Display');
+var Link = require('react-router').Link;
 
 var APP = React.createClass({
 
@@ -48,6 +49,7 @@ var APP = React.createClass({
         <Display if={!this.state.data && !this.state.error}>
           <h1>Data loading</h1>
         </Display>
+        <Link to="/">Home</Link>
         {this.state.data ? React.cloneElement(this.props.children, {state: this.state, emit: this.emit}) : null}
       </div>
     );

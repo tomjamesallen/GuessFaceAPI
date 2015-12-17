@@ -17,13 +17,15 @@ var APP = require('./components/APP');
 
 var HomeScreen = require('./components/HomeScreen');
 var RoundHome = require('./components/RoundHome');
-var Question = require('./components/Question')
+var Question = require('./components/Question');
+var RoundIndex = require('./components/RoundIndex');
 
 ReactDOM.render((
   <Router>
     <Route path="/" component={APP}>
       <IndexRoute component={HomeScreen} />
       <Route path="round/:roundId" component={RoundHome}>
+        <Route path="index" component={RoundIndex} />
         <Route path="question/:questionId" component={Question} />
       </Route> 
     </Route>

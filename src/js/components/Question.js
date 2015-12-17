@@ -1,5 +1,6 @@
 var React = require('react');
 var Link = require('react-router').Link;
+var QuestionDisplay = require('./parts/QuestionDisplay');
 
 var Question = React.createClass({
 
@@ -54,9 +55,6 @@ var Question = React.createClass({
 
   componentDidMount: function () {
     // var router = this.context.router;
-
-
-
   },
 
   emit: function () {
@@ -67,9 +65,7 @@ var Question = React.createClass({
     if (!this.state.question) return null;
     var question = this.state.question;
     return (
-      <div className="question-wrapper">
-        <h2>Question {question.humanId}</h2>
-      </div>
+      <QuestionDisplay question={question} />
     );
   }
 });

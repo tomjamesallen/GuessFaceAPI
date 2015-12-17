@@ -45,7 +45,7 @@ var RoundHome = React.createClass({
   },
 
   componentDidMount: function () {
-    console.log('RoundHome', this);
+    // console.log('RoundHome', this);
   },
 
   emit: function () {
@@ -61,10 +61,12 @@ var RoundHome = React.createClass({
 
         <Display if={!this.props.children}>
           <h2>Round home</h2>
-          <QuestionsList questions={round.questionsData}/>
+          
         </Display>
 
-        {this.props.children ? React.cloneElement(this.props.children, {state: this.props.state, emit: this.emit}) : null}
+        {this.props.children ? React.cloneElement(this.props.children, {state: this.props.state, emit: this.emit, round: round}) : null}
+
+        <Link to={'/round/' + round.humanId + '/index'}>Round Index</Link>
       </div>
     );
   }
