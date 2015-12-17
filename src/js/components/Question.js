@@ -54,6 +54,37 @@ var Question = React.createClass({
     }
   },
 
+  componentWillUpdate: function (nextProps) {
+
+  },
+
+  componentWillReceiveProps: function (nextProps) {
+    if (this.props.params.questionId !== nextProps.params.questionId) {
+      this.updateQuestionAndRound(nextProps);
+    }
+  },
+
+  updateQuestionAndRound: function (nextProps) {
+
+    // This is not working.
+
+    console.log('updateQuestionAndRound');
+    var roundId = nextProps.params.roundId;
+    var machineRoundId = roundId -1;
+    var questionId = nextProps.params.questionId;
+    var machineQuestionId = questionId -1;
+
+    var data = nextProps.state.data;
+
+    var question = data.rounds[machineRoundId].questionsData[machineQuestionId];
+    question.humanId = question.questionId + 1;
+
+    this.setState({
+      question: question,
+      round: data.rounds[machineRoundId]
+    });
+  },
+
   componentDidMount: function () {
     // var router = this.context.router;
   },
