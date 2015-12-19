@@ -15,19 +15,28 @@
           },
           "imgs": {
             "a": {
-              "320": "/api/imgs/round-0/question-0/a/a_320.jpg",
-              "640": "/api/imgs/round-0/question-0/a/a_640.jpg",
-              "960": "/api/imgs/round-0/question-0/a/a_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-0/question-0/a/a_320.jpg",
+                "640": "/api/imgs/round-0/question-0/a/a_640.jpg",
+                "960": "/api/imgs/round-0/question-0/a/a_960.jpg"
+              },
+              "aspectRatio": 1
             },
             "b": {
-              "320": "/api/imgs/round-0/question-0/b/b_320.jpg",
-              "640": "/api/imgs/round-0/question-0/b/b_640.jpg",
-              "960": "/api/imgs/round-0/question-0/b/b_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-0/question-0/b/b_320.jpg",
+                "640": "/api/imgs/round-0/question-0/b/b_640.jpg",
+                "960": "/api/imgs/round-0/question-0/b/b_960.jpg"
+              },
+              "aspectRatio": 1
             },
             "mix": {
-              "320": "/api/imgs/round-0/question-0/mix/mix_320.jpg",
-              "640": "/api/imgs/round-0/question-0/mix/mix_640.jpg",
-              "960": "/api/imgs/round-0/question-0/mix/mix_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-0/question-0/mix/mix_320.jpg",
+                "640": "/api/imgs/round-0/question-0/mix/mix_640.jpg",
+                "960": "/api/imgs/round-0/question-0/mix/mix_960.jpg"
+              },
+              "aspectRatio": 1
             }
           }
         },
@@ -42,19 +51,28 @@
           },
           "imgs": {
             "a": {
-              "320": "/api/imgs/round-0/question-1/a/a_320.jpg",
-              "640": "/api/imgs/round-0/question-1/a/a_640.jpg",
-              "960": "/api/imgs/round-0/question-1/a/a_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-0/question-1/a/a_320.jpg",
+                "640": "/api/imgs/round-0/question-1/a/a_640.jpg",
+                "960": "/api/imgs/round-0/question-1/a/a_960.jpg"
+              },
+              "aspectRatio": 1
             },
             "b": {
-              "320": "/api/imgs/round-0/question-1/b/b_320.jpg",
-              "640": "/api/imgs/round-0/question-1/b/b_640.jpg",
-              "960": "/api/imgs/round-0/question-1/b/b_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-0/question-1/b/b_320.jpg",
+                "640": "/api/imgs/round-0/question-1/b/b_640.jpg",
+                "960": "/api/imgs/round-0/question-1/b/b_960.jpg"
+              },
+              "aspectRatio": 1
             },
             "mix": {
-              "320": "/api/imgs/round-0/question-1/mix/mix_320.jpg",
-              "640": "/api/imgs/round-0/question-1/mix/mix_640.jpg",
-              "960": "/api/imgs/round-0/question-1/mix/mix_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-0/question-1/mix/mix_320.jpg",
+                "640": "/api/imgs/round-0/question-1/mix/mix_640.jpg",
+                "960": "/api/imgs/round-0/question-1/mix/mix_960.jpg"
+              },
+              "aspectRatio": 1
             }
           }
         }
@@ -70,19 +88,28 @@
         },
         "imgs": {
           "a": {
-            "320": "/api/imgs/round-0/question-e/a/a_320.jpg",
-            "640": "/api/imgs/round-0/question-e/a/a_640.jpg",
-            "960": "/api/imgs/round-0/question-e/a/a_960.jpg"
+            "imgs": {
+              "320": "/api/imgs/round-0/question-e/a/a_320.jpg",
+              "640": "/api/imgs/round-0/question-e/a/a_640.jpg",
+              "960": "/api/imgs/round-0/question-e/a/a_960.jpg"
+            },
+            "aspectRatio": 1
           },
           "b": {
-            "320": "/api/imgs/round-0/question-e/b/b_320.jpg",
-            "640": "/api/imgs/round-0/question-e/b/b_640.jpg",
-            "960": "/api/imgs/round-0/question-e/b/b_960.jpg"
+            "imgs": {
+              "320": "/api/imgs/round-0/question-e/b/b_320.jpg",
+              "640": "/api/imgs/round-0/question-e/b/b_640.jpg",
+              "960": "/api/imgs/round-0/question-e/b/b_960.jpg"
+            },
+            "aspectRatio": 1
           },
           "mix": {
-            "320": "/api/imgs/round-0/question-e/mix/mix_320.jpg",
-            "640": "/api/imgs/round-0/question-e/mix/mix_640.jpg",
-            "960": "/api/imgs/round-0/question-e/mix/mix_960.jpg"
+            "imgs": {
+              "320": "/api/imgs/round-0/question-e/mix/mix_320.jpg",
+              "640": "/api/imgs/round-0/question-e/mix/mix_640.jpg",
+              "960": "/api/imgs/round-0/question-e/mix/mix_960.jpg"
+            },
+            "aspectRatio": 1
           }
         }
       }
@@ -102,19 +129,28 @@
           },
           "imgs": {
             "a": {
-              "320": "/api/imgs/round-1/question-0/a/a_320.jpg",
-              "640": "/api/imgs/round-1/question-0/a/a_640.jpg",
-              "960": "/api/imgs/round-1/question-0/a/a_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-1/question-0/a/a_320.jpg",
+                "640": "/api/imgs/round-1/question-0/a/a_640.jpg",
+                "960": "/api/imgs/round-1/question-0/a/a_960.jpg"
+              },
+              "aspectRatio": 1
             },
             "b": {
-              "320": "/api/imgs/round-1/question-0/b/b_320.jpg",
-              "640": "/api/imgs/round-1/question-0/b/b_640.jpg",
-              "960": "/api/imgs/round-1/question-0/b/b_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-1/question-0/b/b_320.jpg",
+                "640": "/api/imgs/round-1/question-0/b/b_640.jpg",
+                "960": "/api/imgs/round-1/question-0/b/b_960.jpg"
+              },
+              "aspectRatio": 1
             },
             "mix": {
-              "320": "/api/imgs/round-1/question-0/mix/mix_320.jpg",
-              "640": "/api/imgs/round-1/question-0/mix/mix_640.jpg",
-              "960": "/api/imgs/round-1/question-0/mix/mix_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-1/question-0/mix/mix_320.jpg",
+                "640": "/api/imgs/round-1/question-0/mix/mix_640.jpg",
+                "960": "/api/imgs/round-1/question-0/mix/mix_960.jpg"
+              },
+              "aspectRatio": 1
             }
           }
         },
@@ -129,19 +165,28 @@
           },
           "imgs": {
             "a": {
-              "320": "/api/imgs/round-1/question-1/a/a_320.jpg",
-              "640": "/api/imgs/round-1/question-1/a/a_640.jpg",
-              "960": "/api/imgs/round-1/question-1/a/a_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-1/question-1/a/a_320.jpg",
+                "640": "/api/imgs/round-1/question-1/a/a_640.jpg",
+                "960": "/api/imgs/round-1/question-1/a/a_960.jpg"
+              },
+              "aspectRatio": 1
             },
             "b": {
-              "320": "/api/imgs/round-1/question-1/b/b_320.jpg",
-              "640": "/api/imgs/round-1/question-1/b/b_640.jpg",
-              "960": "/api/imgs/round-1/question-1/b/b_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-1/question-1/b/b_320.jpg",
+                "640": "/api/imgs/round-1/question-1/b/b_640.jpg",
+                "960": "/api/imgs/round-1/question-1/b/b_960.jpg"
+              },
+              "aspectRatio": 1
             },
             "mix": {
-              "320": "/api/imgs/round-1/question-1/mix/mix_320.jpg",
-              "640": "/api/imgs/round-1/question-1/mix/mix_640.jpg",
-              "960": "/api/imgs/round-1/question-1/mix/mix_960.jpg"
+              "imgs": {
+                "320": "/api/imgs/round-1/question-1/mix/mix_320.jpg",
+                "640": "/api/imgs/round-1/question-1/mix/mix_640.jpg",
+                "960": "/api/imgs/round-1/question-1/mix/mix_960.jpg"
+              },
+              "aspectRatio": 1
             }
           }
         }
@@ -157,19 +202,28 @@
         },
         "imgs": {
           "a": {
-            "320": "/api/imgs/round-1/question-e/a/a_320.jpg",
-            "640": "/api/imgs/round-1/question-e/a/a_640.jpg",
-            "960": "/api/imgs/round-1/question-e/a/a_960.jpg"
+            "imgs": {
+              "320": "/api/imgs/round-1/question-e/a/a_320.jpg",
+              "640": "/api/imgs/round-1/question-e/a/a_640.jpg",
+              "960": "/api/imgs/round-1/question-e/a/a_960.jpg"
+            },
+            "aspectRatio": 1
           },
           "b": {
-            "320": "/api/imgs/round-1/question-e/b/b_320.jpg",
-            "640": "/api/imgs/round-1/question-e/b/b_640.jpg",
-            "960": "/api/imgs/round-1/question-e/b/b_960.jpg"
+            "imgs": {
+              "320": "/api/imgs/round-1/question-e/b/b_320.jpg",
+              "640": "/api/imgs/round-1/question-e/b/b_640.jpg",
+              "960": "/api/imgs/round-1/question-e/b/b_960.jpg"
+            },
+            "aspectRatio": 1
           },
           "mix": {
-            "320": "/api/imgs/round-1/question-e/mix/mix_320.jpg",
-            "640": "/api/imgs/round-1/question-e/mix/mix_640.jpg",
-            "960": "/api/imgs/round-1/question-e/mix/mix_960.jpg"
+            "imgs": {
+              "320": "/api/imgs/round-1/question-e/mix/mix_320.jpg",
+              "640": "/api/imgs/round-1/question-e/mix/mix_640.jpg",
+              "960": "/api/imgs/round-1/question-e/mix/mix_960.jpg"
+            },
+            "aspectRatio": 1
           }
         }
       }

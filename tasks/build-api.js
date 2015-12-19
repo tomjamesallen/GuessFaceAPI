@@ -315,12 +315,22 @@ var createImageVariants = function (imgPath, distDir, imgName, roundId, question
   });
 
   // Create an empty object to store the image 
-  var imgVariantsData = {};
+  var imgVariantsData = {
+    imgs: {}
+  };
 
   // On both PNG and JPG promises returning call function to create each of the
   // images variants.
   Q.allSettled([foundImgPromises['png'].promise, foundImgPromises['jpg'].promise]).then(function () {
     
+    // Save useful metadata.
+    if (imgFileData.metadata.height && imgFileData.metadata.width) {
+      imgVariantsData.aspectRatio = imgFileData.metadata.height/imgFileData.metadata.width;
+    }
+    else {
+      imgVariantsData.aspectRatio = null;
+    }
+
     // Create empty array for imgVariantPromises.
     var imgVariantPromises = [];
 
@@ -332,7 +342,7 @@ var createImageVariants = function (imgPath, distDir, imgName, roundId, question
       
       // Save data on promise returning. 
       imageVariantPromise.then(function (fileName) {
-        imgVariantsData[size] = fileName;
+        imgVariantsData.imgs[size] = fileName;
       });
 
       // Push promise to imgVariantPromises array.
