@@ -30,6 +30,10 @@ var QuestionDisplay = React.createClass({
     this.calculateBestImgs();
   },
 
+  componentWillReceiveProps: function (nextProps) {
+    this.calculateBestImgs(nextProps.question);
+  },
+
   componentWillUnmount: function() {
     window.removeEventListener('resize', this.debouncedResize);
   },
@@ -50,11 +54,11 @@ var QuestionDisplay = React.createClass({
     return selectedWidth;
   },
 
-  getBestImg: function (which, ref) {
-    var question = this.props.question;
+  getBestImg: function (which, ref, question) {
+    var question = question|| this.props.question;
     var el = this.refs[ref];
     var elWidth = el.clientWidth;
-    var imgsArray = question.imgs[which];
+    var imgsArray = question.imgs[which].srcs;
     var pixelRatio = window['devicePixelRatio'] || 1;
     elWidth = elWidth * pixelRatio;
 
@@ -66,16 +70,17 @@ var QuestionDisplay = React.createClass({
     });
 
     var bestImg = this.getClosestValue(elWidth, widths);
-    return question.imgs[which][bestImg];
+    return question.imgs[which].srcs[bestImg];
   },
 
-  calculateBestImgs: function () {
+  calculateBestImgs: function (question) {
+    var question = question || this.props.question;
     this.setState({
       imgs: {
-        imgA: this.getBestImg('a','imgA'),
-        imgB: this.getBestImg('b','imgB'),
-        imgAMix: this.getBestImg('mix','imgAMix'),
-        imgBMix: this.getBestImg('mix','imgBMix')
+        imgA: this.getBestImg('a','imgA', question),
+        imgB: this.getBestImg('b','imgB', question),
+        imgAMix: this.getBestImg('mix','imgAMix', question),
+        imgBMix: this.getBestImg('mix','imgBMix', question)
       }
     });
   },
@@ -91,22 +96,24 @@ var QuestionDisplay = React.createClass({
       var imgBMix = this.state.imgs.imgBMix;
     }
 
+    var wrapperStyle = {paddingBottom: (question.imgs.mix.aspectRatio*100) + "%"};
+
     return (
       <div className="question-wrapper">
         <h2>Question {question.humanId}</h2>
         <div className="a-wrapper">
-          <div className="imgs-wrapper">
+          <div className="imgs-wrapper" style={wrapperStyle}>
             <div className="img-wrapper img-wrapper-question" ref="imgA">
               <Display if={imgs}><img src={imgA} /></Display>
             </div>
-            <div className="img-wrapper img-wrapper-answer" ref="imgAMix" >
+            <div className="img-wrapper img-wrapper-answer" ref="imgAMix">
               <Display if={imgs}><img src={imgAMix} /></Display>
             </div>
           </div>
         </div>
 
         <div className="b-wrapper">
-          <div className="imgs-wrapper">
+          <div className="imgs-wrapper" style={wrapperStyle}>
             <div className="img-wrapper img-wrapper-question" ref="imgB">
               <Display if={imgs}><img src={imgB} /></Display>
             </div>

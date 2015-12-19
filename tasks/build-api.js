@@ -316,7 +316,7 @@ var createImageVariants = function (imgPath, distDir, imgName, roundId, question
 
   // Create an empty object to store the image 
   var imgVariantsData = {
-    imgs: {}
+    srcs: {}
   };
 
   // On both PNG and JPG promises returning call function to create each of the
@@ -342,7 +342,7 @@ var createImageVariants = function (imgPath, distDir, imgName, roundId, question
       
       // Save data on promise returning. 
       imageVariantPromise.then(function (fileName) {
-        imgVariantsData.imgs[size] = fileName;
+        imgVariantsData.srcs[size] = fileName;
       });
 
       // Push promise to imgVariantPromises array.

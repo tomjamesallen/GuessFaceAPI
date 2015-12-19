@@ -68,7 +68,7 @@ var RoundHome = React.createClass({
   render: function () {
     if (!this.state.round) return null;
     var round = this.state.round;
-    console.log(round, this);
+    // console.log(round, this);
     var hasQuestionId = typeof this.props.params.questionId !== 'undefined';
 
     // console.log('hasQuestionId', hasQuestionId);

@@ -65,10 +65,6 @@ var Question = React.createClass({
   },
 
   updateQuestionAndRound: function (nextProps) {
-
-    // This is not working.
-
-    console.log('updateQuestionAndRound');
     var roundId = nextProps.params.roundId;
     var machineRoundId = roundId -1;
     var questionId = nextProps.params.questionId;

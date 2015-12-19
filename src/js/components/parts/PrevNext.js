@@ -14,6 +14,14 @@ var PrevNext = React.createClass({
 
   componentWillMount: function () {
     var question = this.props.question;
+    this.setupLinks(question);
+  },
+
+  componentWillReceiveProps: function (nextProps) {
+    this.setupLinks(nextProps.question);
+  },
+
+  setupLinks: function (question) {
     var questionId = question.questionId;
     var roundId = question.roundData.roundId;
 
@@ -24,7 +32,7 @@ var PrevNext = React.createClass({
     var prev = null;
     var next = null;
 
-    if (numQuestions) {
+    if (numQuestions && questionIdHuman !== 1) {
       first = '/round/' + (roundId + 1) + '/question/1';
     }
 
@@ -36,17 +44,11 @@ var PrevNext = React.createClass({
       next = '/round/' + (roundId + 1) + '/question/' + (questionIdHuman + 1);
     }
 
-    console.log({
-      first: first,
-      prev: prev,
-      next: next
-    });
-
     this.setState({
       first: first,
       prev: prev,
       next: next
-    })
+    });
   },
 
   render: function () {
@@ -57,9 +59,9 @@ var PrevNext = React.createClass({
 
     return (
       <div className="prev-next">
-        {first ? <Link to={first}>First</Link> : null}
-        {prev ? <Link to={prev}>Prev</Link> : null}
-        {next ? <Link to={next}>Next</Link> : null}
+        {first ? <Link to={first}>First</Link> : <span>First</span>}
+        {prev ? <Link to={prev}>Prev</Link> : <span>Prev</span>}
+        {next ? <Link to={next}>Next</Link> : <span>Next</span>}
       </div>
     );
   }
