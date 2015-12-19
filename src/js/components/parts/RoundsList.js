@@ -9,8 +9,10 @@ var RoundsList = React.createClass({
       '/round/' + 
       (round.roundId + 1);
 
+    console.log(round);
+
     return (
-      <li key={i}><Link to={link}>Round {round.roundId + 1}</Link></li>
+      <li key={i}><Link to={link}>Round {round.roundId + 1}: {round.title}</Link></li>
     );
   },
 

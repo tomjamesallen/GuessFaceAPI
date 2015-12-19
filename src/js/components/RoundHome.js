@@ -68,15 +68,7 @@ var RoundHome = React.createClass({
   render: function () {
     if (!this.state.round) return null;
     var round = this.state.round;
-    // console.log(round, this);
     var hasQuestionId = typeof this.props.params.questionId !== 'undefined';
-
-    // console.log('hasQuestionId', hasQuestionId);
-
-    // if (round.exampleData) {
-    //   var example = round.exampleData;
-    //   example.humanId = 'Example Question';
-    // }
 
     return (
       <div>
@@ -90,6 +82,7 @@ var RoundHome = React.createClass({
 
         <div><Link to={'/round/' + round.humanId + '/index'}>Round Index</Link></div>
         <div><Link to={'/round/' + round.humanId + '/example'}>Round Example</Link></div>
+        <div><Link to={'/round/' + round.humanId + '/question/1'}>Start Round</Link></div>
       </div>
     );
   }
