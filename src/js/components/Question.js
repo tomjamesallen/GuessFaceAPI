@@ -2,8 +2,13 @@ var React = require('react');
 var Link = require('react-router').Link;
 var QuestionDisplay = require('./parts/QuestionDisplay');
 var PrevNext = require('./parts/PrevNext');
+var Lifecycle = require('react-router').Lifecycle;
 
 var Question = React.createClass({
+
+  // shouldTransition: false,
+
+  mixins: [ Lifecycle ],
 
   contextTypes: {
     history: React.PropTypes.object.isRequired
@@ -15,7 +20,27 @@ var Question = React.createClass({
     }
   },
 
+  routerWillLeave: function (nextLocation) {
+    var that = this;
+    // console.log('nextLocation', nextLocation);
+
+    // if (!this.shouldTransition) {
+    //   console.log('cancelled transition');
+    //   this.shouldTransition = true;
+    //   setTimeout(function () {
+    //     console.log('call pushstate');
+    //     that.context.history.pushState(null, nextLocation.pathname);
+    //   }, 1000);
+
+    //   return false;
+    // }
+    // else {
+    //   console.log('going to transition this time');
+    // }
+  },
+
   componentWillMount: function () {
+
     // Check that question exists, if not, redirect to round's home.
     // Check that round exists, if not, redirect to home.
     var roundId = this.props.params.roundId;
@@ -82,20 +107,17 @@ var Question = React.createClass({
   },
 
   componentDidMount: function () {
-    // var router = this.context.router;
-  },
-
-  emit: function () {
-
+    
   },
 
   render: function () {
     if (!this.state.question) return null;
     var question = this.state.question;
     var round = this.state.round;
+
     return (
       <div>
-        <QuestionDisplay question={question} />
+        <QuestionDisplay question={question} questionState={this.props.state.questionState} emit={this.props.emit}/>
         <PrevNext question={question} round={round} />
       </div>
     );

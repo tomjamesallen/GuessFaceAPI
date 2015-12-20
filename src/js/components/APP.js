@@ -9,7 +9,13 @@ var APP = React.createClass({
   getInitialState: function () {
     return {
       data: null,
-      error: false
+      error: false,
+      // questionState: false // false / 'resting' / 'question' / 'answer'
+
+      questionState: {
+        current: false,
+        end: false
+      }
     }
   },
 
@@ -21,7 +27,7 @@ var APP = React.createClass({
   },
 
   emit: function (type, data) {
-
+    console.log('emit', type, data);
   },
 
   componentDidMount: function () {
@@ -41,6 +47,8 @@ var APP = React.createClass({
   },
 
   render: function () {
+    // console.log('APP', this);
+
     return (
       <div>
         <Display if={this.state.error}>

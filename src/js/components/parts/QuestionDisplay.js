@@ -2,9 +2,11 @@ var React = require('react');
 var debounce = require('debounce');
 var Display = require('./Display');
 var _ = require('underscore');
-// var gsap = require('gsap');
 var GSAP = require('react-gsap-enhancer').default;
-var TimelineLite = require('../../../../node_modules/gsap/src/uncompressed/TimelineLite');
+
+// var TimelineLite = require('./../vendor/green-sock/src/uncompressed/TimelineLite');
+// var TweenLite = require('./../vendor/green-sock/src/uncompressed/TweenLite');
+// var CSSPlugin = require('../../vendor/green-sock/src/uncompressed/plugins/CSSPlugin');
 
 var QuestionDisplay = GSAP()(React.createClass({
 
@@ -13,7 +15,7 @@ var QuestionDisplay = GSAP()(React.createClass({
   getInitialState: function () {
     return {
       imgs: null,
-      questionState: 'start' // start/question/answer
+      // questionState: 'start' // start/question/answer
     }
   },
 
@@ -25,9 +27,10 @@ var QuestionDisplay = GSAP()(React.createClass({
   },
 
   componentWillUpdate: function (nextProps, nextState) {
-    if (this.state.questionState !== nextState.questionState) {
-      this.updateQuestionState(nextState);
-    }
+    // console.log('nextProps', nextProps);
+    // if (this.state.questionState !== nextState.questionState) {
+    //   this.updateQuestionState(nextState);
+    // }
   },
 
   updateQuestionState: function (nextState) {
@@ -47,8 +50,11 @@ var QuestionDisplay = GSAP()(React.createClass({
   debouncedResize: null,
 
   componentDidMount: function() {
+    // console.log(this);
     this.debouncedResize = debounce(this.handleResize, 200);
     window.addEventListener('resize', this.debouncedResize);
+
+    var refs = this.cRefs;
 
     // window.imgAMix = this.refs.imgAMix;
 
@@ -56,10 +62,33 @@ var QuestionDisplay = GSAP()(React.createClass({
     // need to get the width of the wrapper elements.
     this.calculateBestImgs();
 
-    // Timeline Tests
-    this.tl = this.addAnimation(createAnimation);
+    // // Timeline Tests
+    // this.tl = this.addAnimation(function () {
+    //   var tl = new TimelineLite();
+    //   // tl.set(refs.imgA, {opacity:"0"}); 
+    //   // tl.set(refs.imgB, {opacity:"0"}); 
+    //   // tl.set(refs.imgAMix, {opacity:"0"}); 
+    //   tl.add(TweenLite.to(document.getElementById('react-container'), 1, {opacity:"0"}));
 
-    console.log('did mount.', this);
+    //   return tl;
+    // });
+
+    // TweenLite.to(document.getElementById('test-element'), 1, {
+    //   left: 100,
+    //   backgroundColor: orange,
+    //   onComplete: function () {
+    //     console.log('all done');
+    //   }
+    // });
+
+    // console.log({
+    //   TweenLite: TweenLite,
+    //   TimelineLite: TimelineLite
+    // });
+
+    // this.tl.play();
+
+    // console.log('did mount.', this.tl);
 
     // this.tl.fromTo(this.cRefs.imgA, 0.5, {opacity:"0"});
     // this.tl.fromTo(this.cRefs.imgB, 0.5, {opacity:"0"});
@@ -125,19 +154,22 @@ var QuestionDisplay = GSAP()(React.createClass({
   },
 
   showQuestion: function () {
-    this.setState({
-      questionState: 'question'
-    });
+    // this.setState({
+    //   questionState: 'question'
+    // });
+    
+    this.props.emit('questionState', 'question');
   },
 
   showAnswer: function () {
-    this.setState({
-      questionState: 'answer'
-    });
+    // this.setState({
+    //   questionState: 'answer'
+    // });
+
+    this.props.emit('questionState', 'answer');
   },
 
   render: function () {
-    console.log('render');
     var question = this.props.question;
     var imgs = this.state.imgs;
     var that = this;
@@ -153,7 +185,7 @@ var QuestionDisplay = GSAP()(React.createClass({
     var wrapperStyle = {paddingBottom: (question.imgs.mix.aspectRatio*100) + "%"};
 
     return (
-      <div className={"question-wrapper question-state-" + this.state.questionState}>
+      <div className={"question-wrapper question-state-"}>
         <div className="title-wrapper">
           <h2>Question {question.humanId}</h2>
         </div>
