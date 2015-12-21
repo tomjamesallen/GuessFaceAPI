@@ -2,8 +2,28 @@ var React = require('react');
 var QuestionsList = require('./parts/QuestionsList');
 var QuestionDisplay = require('./parts/QuestionDisplay');
 var Link = require('react-router').Link;
+var Lifecycle = require('react-router').Lifecycle;
 
 var RoundExample = React.createClass({
+
+  mixins: [ Lifecycle ],
+
+  routerWillLeave: function (nextLocation) {
+    var that = this;
+
+    var questionState = this.props.state.questionState;
+
+    // console.log('routerWillLeave: questionState', questionState);
+
+    if (questionState.target === false && questionState.current === false) {
+      return true;
+    }
+
+    this.props.emit('storeTransition', nextLocation);
+    this.props.emit('questionState', 'end');
+
+    return false;
+  },
 
   componentWillMount: function () {
     // Check that round exists, if not, redirect to home.
@@ -32,6 +52,12 @@ var RoundExample = React.createClass({
       });
     }
   },
+
+  componentDidMount: function () {
+    // Here we update the target question state to 'ready'.
+
+    this.props.emit('questionState', 'ready');
+  },
   
   render: function () {
     if (!this.state.question) return null;
@@ -45,7 +71,7 @@ var RoundExample = React.createClass({
     
     return (
       <div>
-        <QuestionDisplay question={question} />
+        <QuestionDisplay question={question} questionState={this.props.state.questionState} emit={this.props.emit}/>
         <Link to={link}>Start Round</Link>
       </div>
     );

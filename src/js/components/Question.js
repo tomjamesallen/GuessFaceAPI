@@ -22,21 +22,19 @@ var Question = React.createClass({
 
   routerWillLeave: function (nextLocation) {
     var that = this;
-    // console.log('nextLocation', nextLocation);
 
-    // if (!this.shouldTransition) {
-    //   console.log('cancelled transition');
-    //   this.shouldTransition = true;
-    //   setTimeout(function () {
-    //     console.log('call pushstate');
-    //     that.context.history.pushState(null, nextLocation.pathname);
-    //   }, 1000);
+    var questionState = this.props.state.questionState;
 
-    //   return false;
-    // }
-    // else {
-    //   console.log('going to transition this time');
-    // }
+    // console.log('routerWillLeave: questionState', questionState);
+
+    if (questionState.target === false && questionState.current === false) {
+      return true;
+    }
+
+    this.props.emit('storeTransition', nextLocation);
+    this.props.emit('questionState', 'end');
+
+    return false;
   },
 
   componentWillMount: function () {
@@ -104,10 +102,14 @@ var Question = React.createClass({
       question: question,
       round: data.rounds[machineRoundId]
     });
+
+    this.props.emit('questionState', 'ready');
   },
 
   componentDidMount: function () {
-    
+    // Here we update the target question state to 'ready'.
+
+    this.props.emit('questionState', 'ready');
   },
 
   render: function () {

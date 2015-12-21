@@ -21,16 +21,47 @@ var QuestionDisplay = GSAP()(React.createClass({
 
   componentWillMount: function () {
     
-
+    // this.manageQuestionStateChange(null, this.props.questionState);
     // window.tl = tl;
 
   },
 
   componentWillUpdate: function (nextProps, nextState) {
-    // console.log('nextProps', nextProps);
-    // if (this.state.questionState !== nextState.questionState) {
-    //   this.updateQuestionState(nextState);
-    // }
+    
+  },
+
+  manageQuestionStateChange: function (newQuestionState) {
+    console.log(newQuestionState);
+
+    // No animation required if target is false.
+    if (newQuestionState.target === false) return;
+
+    // If target is already current then return here.
+    if (newQuestionState.target === newQuestionState.current) return;
+
+    var that = this;
+
+    console.log('change target to: ', newQuestionState.target);
+
+    // console.log('targets dont match');
+
+    setTimeout(function () {
+      if (newQuestionState.target === 'end') {
+        console.log('intended end');
+        that.props.emit('questionStateCallback', false);
+        that.props.emit('questionState', false);
+        that.props.emit('retryTransition');
+      }
+      else {
+        if (newQuestionState.target === 'ready' ||
+          newQuestionState.target === 'question' ||
+          newQuestionState.target === 'answer') {
+          console.log('emit update to:', newQuestionState.target);
+          that.props.emit('questionStateCallback', newQuestionState.target);
+        }
+      }
+      
+    }, 700);
   },
 
   updateQuestionState: function (nextState) {
@@ -97,7 +128,9 @@ var QuestionDisplay = GSAP()(React.createClass({
   },
 
   componentWillReceiveProps: function (nextProps) {
+    // console.log('componentWillReceiveProps', nextProps, this.props);
     this.calculateBestImgs(nextProps.question);
+    this.manageQuestionStateChange(nextProps.questionState);
   },
 
   componentWillUnmount: function() {
@@ -154,18 +187,10 @@ var QuestionDisplay = GSAP()(React.createClass({
   },
 
   showQuestion: function () {
-    // this.setState({
-    //   questionState: 'question'
-    // });
-    
     this.props.emit('questionState', 'question');
   },
 
   showAnswer: function () {
-    // this.setState({
-    //   questionState: 'answer'
-    // });
-
     this.props.emit('questionState', 'answer');
   },
 
