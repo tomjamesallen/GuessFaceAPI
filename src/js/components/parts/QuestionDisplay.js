@@ -3,10 +3,11 @@ var debounce = require('debounce');
 var Display = require('./Display');
 var _ = require('underscore');
 var GSAP = require('react-gsap-enhancer').default;
+var $ = require('../../vendor/jquery-1.11.3.min');
 
-// var TimelineLite = require('./../vendor/green-sock/src/uncompressed/TimelineLite');
-// var TweenLite = require('./../vendor/green-sock/src/uncompressed/TweenLite');
-// var CSSPlugin = require('../../vendor/green-sock/src/uncompressed/plugins/CSSPlugin');
+var TimelineLite = require('../../vendor/greensock-js/src/uncompressed/TimelineLite');
+var TweenLite = require('../../vendor/greensock-js/src/uncompressed/TweenLite');
+var CSSPlugin = require('../../vendor/greensock-js/src/uncompressed/plugins/CSSPlugin');
 
 var QuestionDisplay = GSAP()(React.createClass({
 
@@ -43,25 +44,35 @@ var QuestionDisplay = GSAP()(React.createClass({
 
     console.log('change target to: ', newQuestionState.target);
 
-    // console.log('targets dont match');
+    // We need to trigger animations here.
 
-    setTimeout(function () {
-      if (newQuestionState.target === 'end') {
-        console.log('intended end');
-        that.props.emit('questionStateCallback', false);
-        that.props.emit('questionState', false);
-        that.props.emit('retryTransition');
-      }
-      else {
-        if (newQuestionState.target === 'ready' ||
-          newQuestionState.target === 'question' ||
-          newQuestionState.target === 'answer') {
-          console.log('emit update to:', newQuestionState.target);
-          that.props.emit('questionStateCallback', newQuestionState.target);
-        }
-      }
+    if (newQuestionState.target === 'ready') {
+      this.playAnimation('ready');
+    }
+    if (newQuestionState.target === 'answer') {
+      this.playAnimation('answer');
+    }
+    if (newQuestionState.target === 'question') {
+      this.playAnimation('question');
+    }
+
+    // setTimeout(function () {
+    //   if (newQuestionState.target === 'end') {
+    //     console.log('intended end');
+    //     that.props.emit('questionStateCallback', false);
+    //     that.props.emit('questionState', false);
+    //     that.props.emit('retryTransition');
+    //   }
+    //   else {
+    //     if (newQuestionState.target === 'ready' ||
+    //       newQuestionState.target === 'question' ||
+    //       newQuestionState.target === 'answer') {
+    //       console.log('emit update to:', newQuestionState.target);
+    //       that.props.emit('questionStateCallback', newQuestionState.target);
+    //     }
+    //   }
       
-    }, 700);
+    // }, 1000);
   },
 
   updateQuestionState: function (nextState) {
@@ -80,51 +91,239 @@ var QuestionDisplay = GSAP()(React.createClass({
 
   debouncedResize: null,
 
+  animations: {},
+
+  currentAnimation: null,
+
+  playAnimation: function (animation) {
+    // _.forEach(this.animations, function (thisAnimation, key) {
+    //   thisAnimation.pause();
+    // });
+    // if (this.animations[animation]) {
+    //   console.log('play', animation);
+    //   this.animations[animation].restart();
+    // }
+    // if (animation === 'ready') {
+    //   this.animations.ready.play();
+    // }
+
+    if (this.currentAnimation) {
+      this.currentAnimation.kill();
+      this.currentAnimation = null;
+    }
+
+    this.currentAnimation = this.returnAnimation(animation);
+    this.currentAnimation.play();
+  },
+
+  stopAllAnimations: function () {
+    // _.forEach(this.animations, function (thisAnimation, key) {
+    //   thisAnimation.pause();
+    // });
+
+    if (this.currentAnimation) {
+      this.currentAnimation.kill();
+      this.currentAnimation = null;
+    }
+  },
+
+  returnAnimationSteps: function (animation, tl) {
+
+    // return tl;
+
+    var animationSettings = {};
+    var refs = this.cRefs;
+
+    if (animation === 'ready') {
+      animationSettings.abWrapperPos = 0;
+      animationSettings.aPos = 0;
+      animationSettings.bPos = 0;
+      animationSettings.questionOpacity = 0.3;
+      animationSettings.answerOpacity = 0;
+    }
+    if (animation === 'question') {
+      animationSettings.abWrapperPos = 0;
+      animationSettings.aPos = 0;
+      animationSettings.bPos = 0;
+      animationSettings.questionOpacity = 1;
+      animationSettings.answerOpacity = 0;
+    }
+    if (animation === 'answer') {
+      animationSettings.abWrapperPos = 0;
+      animationSettings.aPos = -50;
+      animationSettings.bPos = 50;
+      animationSettings.questionOpacity = 1;
+      animationSettings.answerOpacity = 1;
+    }
+    if (animation === 'end') {
+      animationSettings.abWrapperPos = 100;
+      animationSettings.aPos = -50;
+      animationSettings.bPos = 50;
+      animationSettings.questionOpacity = 0.3;
+      animationSettings.answerOpacity = 1;
+    }
+
+    console.log('animationSettings', animationSettings);
+
+    tl
+      .add('start')
+      
+      // .set(refs.abWrapper, {
+      //   transform: $(refs.abWrapper).css('transform')
+      // }, 'start')
+      .to(refs.abWrapper, 1, {
+        transform: 'translateX(' + animationSettings.abWrapperPos + '%)',
+      }, 'start')
+
+      // .set(refs.aWrapper, {
+      //   transform: $(refs.aWrapper).css('transform')
+      // }, 'start')
+      .from(refs.aWrapper, 1, {
+        transform: 'translateX(' + animationSettings.aPos + '%)',
+        // xPercent: animationSettings.aPos,
+      }, 'start')
+      
+      // .set(refs.bWrapper, {
+      //   transform: $(refs.bWrapper).css('transform')
+      // }, 'start')
+      .from(refs.bWrapper, 1, {
+        transform: 'translateX(' + animationSettings.bPos + '%)',
+        // xPercent: animationSettings.bPos,
+      }, 'start')
+      
+      // .set(refs.imgAMix, {
+      //   transform: $(refs.imgAMix).css('opacity')
+      // }, 'start')
+      // .to(refs.imgAMix, 1, {
+      //   autoAlpha: 0,
+      // }, 'start')
+
+      // .set(refs.imgBMix, {
+      //   transform: $(refs.imgBMix).css('opacity')
+      // }, 'start')
+      // .to(refs.imgBMix, 1, {
+      //   autoAlpha: 0,
+      // }, 'start');
+
+    return tl;
+  },
+
+  returnAnimation: function (animation, endCallback) {
+    console.log('return animation', animation);
+    var endCallback = endCallback || function () {};
+    var tl = new TimelineLite({
+      paused: true,
+      onComplete: endCallback,
+      overwrite: true
+    });
+
+    var refs = this.cRefs;
+
+    tl = this.returnAnimationSteps(animation, tl);
+    console.log(tl);
+
+    // tl
+    //   .add('start')
+      
+    //   .set(refs.abWrapper, {
+    //     transform: $(refs.abWrapper).css('transform')
+    //   }, 'start')
+    //   .to(refs.abWrapper, 1, {
+    //     transform: 'translateX(0%)',
+    //   }, 'start')
+
+    //   .set(refs.aWrapper, {
+    //     transform: $(refs.aWrapper).css('transform')
+    //   }, 'start')
+    //   .to(refs.aWrapper, 1, {
+    //     // transform: 'translateX(50%)',
+    //     xPercent: 50
+    //   }, 'start')
+      
+    //   .set(refs.bWrapper, {
+    //     transform: $(refs.bWrapper).css('transform')
+    //   }, 'start')
+    //   .to(refs.bWrapper, 1, {
+    //     // transform: 'translateX(50%)',
+    //     xPercent: 50
+    //   }, 'start')
+
+    return tl;
+  },
+
+  setupAnimations: function () {
+    // var refs = this.cRefs;
+
+    // console.log('setup aimations', refs, this);
+
+    // var animationEndCallback = function () {
+    //   console.log('arguments', arguments);
+    // };
+
+    // this.animations.ready = this.addAnimation(function () {
+    //   return new TimelineLite({
+    //     paused: true,
+    //     onComplete: animationEndCallback
+    //   })
+    //   .to(refs.abWrapper, 1, {
+    //     xPercent: 100,
+    //   });
+    // });
+
+    // this.animations.question = this.addAnimation(function () {
+    //   return new TimelineLite({
+    //     paused: true,
+    //     onComplete: animationEndCallback
+    //   })
+    //   .add('start')
+    //   .to(refs.abWrapper, 1, {
+    //     xPercent: 100,
+    //   }, 'start')
+    //   .to(refs.aWrapper, 1, {
+    //     xPercent: 0,
+    //   }, 'start')
+    //   .to(refs.bWrapper, 1, {
+    //     xPercent: 0,
+    //   }, 'start')
+    //   .to(refs.imgAMix, 1, {
+    //     opacity: 0,
+    //   }, 'start')
+    //   .to(refs.imgBMix, 1, {
+    //     opacity: 0,
+    //   }, 'start');
+    // });
+
+    // this.animations.answer = this.addAnimation(function () {
+    //   return new TimelineLite({
+    //     paused: true,
+    //     onComplete: animationEndCallback
+    //   })
+    //   .add('start')
+    //   .to(refs.abWrapper, 1, {
+    //     xPercent: 100,
+    //   }, 'start')
+    //   .to(refs.aWrapper, 1, {
+    //     xPercent: -50,
+    //   }, 'start')
+    //   .to(refs.bWrapper, 1, {
+    //     xPercent: 50,
+    //   }, 'start')
+    //   .add('reveal')
+    //   .to(refs.imgAMix, 1, {
+    //     opacity: 1,
+    //   }, 'reveal')
+    //   .to(refs.imgBMix, 1, {
+    //     opacity: 1,
+    //   }, 'reveal');
+    // });
+  },
+
   componentDidMount: function() {
     // console.log(this);
     this.debouncedResize = debounce(this.handleResize, 200);
     window.addEventListener('resize', this.debouncedResize);
 
-    var refs = this.cRefs;
-
-    // window.imgAMix = this.refs.imgAMix;
-
-    // We have to call calculateBestImgs after component has mounted because we
-    // need to get the width of the wrapper elements.
-    this.calculateBestImgs();
-
-    // // Timeline Tests
-    // this.tl = this.addAnimation(function () {
-    //   var tl = new TimelineLite();
-    //   // tl.set(refs.imgA, {opacity:"0"}); 
-    //   // tl.set(refs.imgB, {opacity:"0"}); 
-    //   // tl.set(refs.imgAMix, {opacity:"0"}); 
-    //   tl.add(TweenLite.to(document.getElementById('react-container'), 1, {opacity:"0"}));
-
-    //   return tl;
-    // });
-
-    // TweenLite.to(document.getElementById('test-element'), 1, {
-    //   left: 100,
-    //   backgroundColor: orange,
-    //   onComplete: function () {
-    //     console.log('all done');
-    //   }
-    // });
-
-    // console.log({
-    //   TweenLite: TweenLite,
-    //   TimelineLite: TimelineLite
-    // });
-
-    // this.tl.play();
-
-    // console.log('did mount.', this.tl);
-
-    // this.tl.fromTo(this.cRefs.imgA, 0.5, {opacity:"0"});
-    // this.tl.fromTo(this.cRefs.imgB, 0.5, {opacity:"0"});
-    // this.tl.fromTo(this.cRefs.imgAMix, 0.5, {opacity:"0"});
-    // this.tl.fromTo(this.cRefs.imgBMix, 0.5, {opacity:"0"});
+    // this.setupAnimations();
   },
 
   componentWillReceiveProps: function (nextProps) {
@@ -194,6 +393,10 @@ var QuestionDisplay = GSAP()(React.createClass({
     this.props.emit('questionState', 'answer');
   },
 
+  resetToReady: function () {
+    this.props.emit('questionState', 'ready');
+  },
+
   render: function () {
     var question = this.props.question;
     var imgs = this.state.imgs;
@@ -215,7 +418,7 @@ var QuestionDisplay = GSAP()(React.createClass({
           <h2>Question {question.humanId}</h2>
         </div>
 
-        <div className="a-b-wrapper">
+        <div className="a-b-wrapper" ref={function (el) {that.cRefs.abWrapper = el}}>
           <div className="mobile-question-only-wrapper" style={wrapperStyle} ref={function (el) {that.cRefs.imgMix = el}}>
             <Display if={imgs}><img src={imgMix} /></Display>
           </div>
@@ -244,8 +447,10 @@ var QuestionDisplay = GSAP()(React.createClass({
         </div>
 
         <nav className="navigation-wrapper">
+          <button onClick={this.resetToReady}>Ready</button>
           <button onClick={this.showQuestion}>Question</button>
           <button onClick={this.showAnswer}>Answer</button>
+          <button onClick={this.stopAllAnimations}>stopAllAnimations</button>
         </nav>
       </div>
     );

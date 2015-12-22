@@ -1,22 +1,33 @@
 .question-wrapper {
   .a-b-wrapper {
     @include cf;
+    position: relative;
+    padding-bottom: 50%;
+    overflow: hidden;
+    // transform: translateX(-100%);
   }
   .a-wrapper,
   .b-wrapper {
     @include desktop {
+      position: absolute;
       width: 50%;
-      float: left;
+      // float: left;
     }
   }
   .a-wrapper {
     @include desktop {
+      left: 25%;
+      padding-left: $gutter/2;
       padding-right: $gutter/2;
+      // transform: translateX(50%);
     }
   }
   .b-wrapper {
     @include desktop {
+      left: 25%;
       padding-left: $gutter/2;
+      padding-right: $gutter/2;
+      // transform: translateX(-50%);
     }
   }
 
@@ -54,7 +65,7 @@
 
   .img-wrapper-answer {
     opacity: 0;
-    transition: all $medium-transition $animation-easing;
+    // transition: all $medium-transition $animation-easing;
   }
 
   // &.question-state-answer {

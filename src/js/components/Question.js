@@ -3,12 +3,11 @@ var Link = require('react-router').Link;
 var QuestionDisplay = require('./parts/QuestionDisplay');
 var PrevNext = require('./parts/PrevNext');
 var Lifecycle = require('react-router').Lifecycle;
+var QuestionRouterMixin = require('./mixins/QuestionRouterMixin');
 
 var Question = React.createClass({
 
-  // shouldTransition: false,
-
-  mixins: [ Lifecycle ],
+  mixins: [ Lifecycle, QuestionRouterMixin ],
 
   contextTypes: {
     history: React.PropTypes.object.isRequired
@@ -18,23 +17,6 @@ var Question = React.createClass({
     return {
       question: null,
     }
-  },
-
-  routerWillLeave: function (nextLocation) {
-    var that = this;
-
-    var questionState = this.props.state.questionState;
-
-    // console.log('routerWillLeave: questionState', questionState);
-
-    if (questionState.target === false && questionState.current === false) {
-      return true;
-    }
-
-    this.props.emit('storeTransition', nextLocation);
-    this.props.emit('questionState', 'end');
-
-    return false;
   },
 
   componentWillMount: function () {
@@ -102,12 +84,6 @@ var Question = React.createClass({
       question: question,
       round: data.rounds[machineRoundId]
     });
-
-    this.props.emit('questionState', 'ready');
-  },
-
-  componentDidMount: function () {
-    // Here we update the target question state to 'ready'.
 
     this.props.emit('questionState', 'ready');
   },

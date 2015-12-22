@@ -28,9 +28,7 @@ var APP = React.createClass({
 
   componentWillUpdate: function (nextProps, nextState) {
     // Watch for data loading.
-    if (!this.state.data && nextState.data) {
-      console.log('data loaded');
-    }
+    if (!this.state.data && nextState.data) {}
   },
 
   emit: function (type, data) {
@@ -70,8 +68,6 @@ var APP = React.createClass({
         });
       }
     }
-
-    // console.log('new state', this.state);
   },
 
   componentDidMount: function () {
@@ -91,8 +87,6 @@ var APP = React.createClass({
   },
 
   render: function () {
-    // console.log('APP', this);
-
     return (
       <div>
         <Display if={this.state.error}>

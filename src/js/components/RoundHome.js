@@ -45,22 +45,6 @@ var RoundHome = React.createClass({
     }
   },
 
-  componentWillUpdate: function (nextProps, nextState) {
-    // var roundId = this.props.params.roundId;
-    // var machineRoundId = roundId -1;
-    // var data = this.props.state.data;
-    // var round = data.rounds[machineRoundId];
-    // round.humanId = round.roundId + 1;
-
-    // this.setState({
-    //   round: round
-    // });
-  },
-
-  componentDidMount: function () {
-    // console.log('RoundHome', this);
-  },
-
   render: function () {
     if (!this.state.round) return null;
     var round = this.state.round;
