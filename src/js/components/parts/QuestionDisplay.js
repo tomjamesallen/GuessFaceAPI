@@ -48,13 +48,9 @@ var QuestionDisplay = GSAP()(React.createClass({
     // We need to trigger animations here.
 
     var animationCompleteCallback = function (animation) {
-      console.log({
-        animationCompleteCallback: animation
-      })
 
       if (animation === 'end') {
-        console.log('end so retry transition and stuff')
-        // that.playAnimation('reset');
+        that.playAnimation('reset');
 
         that.props.emit('questionStateCallback', false);
         that.props.emit('questionState', false);
@@ -64,7 +60,6 @@ var QuestionDisplay = GSAP()(React.createClass({
         if (animation === 'ready' ||
           animation === 'question' ||
           animation === 'answer') {
-          console.log('emit update to:', animation);
           that.props.emit('questionStateCallback', animation);
         }
       }
@@ -85,24 +80,6 @@ var QuestionDisplay = GSAP()(React.createClass({
     if (newQuestionState.target === 'reset') {
       this.playAnimation('reset', animationCompleteCallback);
     }
-
-    // setTimeout(function () {
-    //   if (newQuestionState.target === 'end') {
-    //     console.log('intended end');
-    //     that.props.emit('questionStateCallback', false);
-    //     that.props.emit('questionState', false);
-    //     that.props.emit('retryTransition');
-    //   }
-    //   else {
-    //     if (newQuestionState.target === 'ready' ||
-    //       newQuestionState.target === 'question' ||
-    //       newQuestionState.target === 'answer') {
-    //       console.log('emit update to:', newQuestionState.target);
-    //       that.props.emit('questionStateCallback', newQuestionState.target);
-    //     }
-    //   }
-      
-    // }, 1000);
   },
 
   updateQuestionState: function (nextState) {
@@ -121,13 +98,10 @@ var QuestionDisplay = GSAP()(React.createClass({
 
   playAnimation: function (animation, callback) {
 
-    console.log('playAnimation', animation);
-
     var callback = callback || function () {};
 
     if (this.currentAnimation) {
-      this.currentAnimation.kill();
-      this.currentAnimation = null;
+      this.currentAnimation.pause();
     }
 
     this.currentAnimation = this.addAnimation(this.returnAnimation(animation, callback));
@@ -136,8 +110,7 @@ var QuestionDisplay = GSAP()(React.createClass({
 
   stopAllAnimations: function () {
     if (this.currentAnimation) {
-      this.currentAnimation.kill();
-      this.currentAnimation = null;
+      this.currentAnimation.pause();
     }
   },
 
@@ -152,7 +125,7 @@ var QuestionDisplay = GSAP()(React.createClass({
       animationSettings.abWrapperPos = 0;
       animationSettings.aPos = 0;
       animationSettings.bPos = 0;
-      animationSettings.questionOpacity = 0.3;
+      animationSettings.questionOpacity = 0;
       animationSettings.answerOpacity = 0;
       animationSettings.fadeOn = 'start';
       animationSettings.fadeTime = animationTime;
@@ -195,19 +168,16 @@ var QuestionDisplay = GSAP()(React.createClass({
     if (!animationSettings) {
 
       if (animation === 'reset') {
-        console.log('reset set animation.');
-        tl.set(refs.abWrapper, {transform: null})
-          .set(refs.aWrapper, {transform: null})
-          .set(refs.bWrapper, {transform: null})
-          .set(refs.imgA, {opacity: null})
-          .set(refs.imgB, {opacity: null})
-          .set(refs.imgAMix, {opacity: null})
-          .set(refs.imgBMix, {opacity: null})
+        tl.set(refs.abWrapper, {clearProps:"all"})
+          .set(refs.aWrapper, {clearProps:"all"})
+          .set(refs.bWrapper, {clearProps:"all"})
+          .set(refs.imgA, {clearProps:"all"})
+          .set(refs.imgB, {clearProps:"all"})
+          .set(refs.imgAMix, {clearProps:"all"})
+          .set(refs.imgBMix, {clearProps:"all"})
       }
       return tl;
     }
-
-    console.log($(refs.abWrapper).css('transform'));
 
     tl.add('start')
       
@@ -317,6 +287,13 @@ var QuestionDisplay = GSAP()(React.createClass({
 
   componentWillUnmount: function() {
     window.removeEventListener('resize', this.debouncedResize);
+
+    console.log(this);
+
+    if (this.currentAnimation) {
+      this.currentAnimation.kill();
+      this.currentAnimation = null;
+    }
   },
 
   // Borrowed from Imager.js.
@@ -405,8 +382,6 @@ var QuestionDisplay = GSAP()(React.createClass({
 
     var wrapperStyle = {paddingBottom: (question.imgs.mix.aspectRatio*100) + "%"};
 
-    console.log(this);
-
     return (
       <div className={"question-wrapper question-state-" + this.props.questionState.current}>
         <div className="title-wrapper">
@@ -442,12 +417,8 @@ var QuestionDisplay = GSAP()(React.createClass({
         </div>
 
         <nav className="navigation-wrapper">
-          <button onClick={this.resetToReady}>Ready</button>
           <button onClick={this.showQuestion}>Question</button>
           <button onClick={this.showAnswer}>Answer</button>
-          <button onClick={this.stopAllAnimations}>stopAllAnimations</button>
-          <button onClick={this.endQuestion}>endQuestion</button>
-          <button onClick={this.resetQuestion}>resetQuestion</button>
         </nav>
       </div>
     );

@@ -515,7 +515,8 @@ html {
 .question-wrapper .imgs-wrapper {
   position: relative;
   margin-bottom: 32px;
-  margin-bottom: 2rem; }
+  margin-bottom: 2rem;
+  background-color: #B4C2AA; }
   .question-wrapper .imgs-wrapper .img-wrapper {
     opacity: 0;
     width: 100%;
