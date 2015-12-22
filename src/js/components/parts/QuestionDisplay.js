@@ -5,7 +5,7 @@ var _ = require('underscore');
 var GSAP = require('react-gsap-enhancer').default;
 var $ = require('../../vendor/jquery-1.11.3.min');
 
-var TimelineLite = require('../../vendor/greensock-js/src/uncompressed/TimelineLite');
+var TimelineMax = require('../../vendor/greensock-js/src/uncompressed/TimelineMax');
 var TweenLite = require('../../vendor/greensock-js/src/uncompressed/TweenLite');
 var CSSPlugin = require('../../vendor/greensock-js/src/uncompressed/plugins/CSSPlugin');
 require('../../vendor/greensock-js/src/uncompressed/easing/EasePack');
@@ -33,7 +33,7 @@ var QuestionDisplay = GSAP()(React.createClass({
   },
 
   manageQuestionStateChange: function (newQuestionState) {
-    console.log(newQuestionState);
+    // console.log(newQuestionState);
 
     // No animation required if target is false.
     if (newQuestionState.target === false) return;
@@ -43,24 +43,47 @@ var QuestionDisplay = GSAP()(React.createClass({
 
     var that = this;
 
-    console.log('change target to: ', newQuestionState.target);
+    // console.log('change target to: ', newQuestionState.target);
 
     // We need to trigger animations here.
 
+    var animationCompleteCallback = function (animation) {
+      console.log({
+        animationCompleteCallback: animation
+      })
+
+      if (animation === 'end') {
+        console.log('end so retry transition and stuff')
+        // that.playAnimation('reset');
+
+        that.props.emit('questionStateCallback', false);
+        that.props.emit('questionState', false);
+        that.props.emit('retryTransition');
+      }
+      else {
+        if (animation === 'ready' ||
+          animation === 'question' ||
+          animation === 'answer') {
+          console.log('emit update to:', animation);
+          that.props.emit('questionStateCallback', animation);
+        }
+      }
+    };
+
     if (newQuestionState.target === 'ready') {
-      this.playAnimation('ready');
+      this.playAnimation('ready', animationCompleteCallback);
     }
     if (newQuestionState.target === 'answer') {
-      this.playAnimation('answer');
+      this.playAnimation('answer', animationCompleteCallback);
     }
     if (newQuestionState.target === 'question') {
-      this.playAnimation('question');
+      this.playAnimation('question', animationCompleteCallback);
     }
     if (newQuestionState.target === 'end') {
-      this.playAnimation('end');
+      this.playAnimation('end', animationCompleteCallback);
     }
     if (newQuestionState.target === 'reset') {
-      this.playAnimation('reset');
+      this.playAnimation('reset', animationCompleteCallback);
     }
 
     // setTimeout(function () {
@@ -96,13 +119,18 @@ var QuestionDisplay = GSAP()(React.createClass({
 
   currentAnimation: null,
 
-  playAnimation: function (animation) {
+  playAnimation: function (animation, callback) {
+
+    console.log('playAnimation', animation);
+
+    var callback = callback || function () {};
+
     if (this.currentAnimation) {
       this.currentAnimation.kill();
       this.currentAnimation = null;
     }
 
-    this.currentAnimation = this.returnAnimation(animation);
+    this.currentAnimation = this.addAnimation(this.returnAnimation(animation, callback));
     this.currentAnimation.play();
   },
 
@@ -167,6 +195,7 @@ var QuestionDisplay = GSAP()(React.createClass({
     if (!animationSettings) {
 
       if (animation === 'reset') {
+        console.log('reset set animation.');
         tl.set(refs.abWrapper, {transform: null})
           .set(refs.aWrapper, {transform: null})
           .set(refs.bWrapper, {transform: null})
@@ -177,6 +206,8 @@ var QuestionDisplay = GSAP()(React.createClass({
       }
       return tl;
     }
+
+    console.log($(refs.abWrapper).css('transform'));
 
     tl.add('start')
       
@@ -202,7 +233,7 @@ var QuestionDisplay = GSAP()(React.createClass({
       .to(refs.bWrapper, animationSettings.animationTime, {
         x: animationSettings.bPos + '%',
         ease: Power2.easeInOut
-      }, 'start');
+      }, 'start')
 
       .add('reveal')
 
@@ -242,19 +273,28 @@ var QuestionDisplay = GSAP()(React.createClass({
   },
 
   returnAnimation: function (animation, endCallback) {
-    console.log('return animation', animation);
+
+    var that = this;
     var endCallback = endCallback || function () {};
-    var tl = new TimelineLite({
-      paused: true,
-      onComplete: endCallback,
-      overwrite: true
-    });
 
-    var refs = this.cRefs;
+    var callback = function () {
+      endCallback(animation);
+    };
 
-    tl = this.returnAnimationSteps(animation, tl);
+    return function () {
 
-    return tl;
+      var tl = new TimelineMax({
+        paused: true,
+        onComplete: callback,
+        overwrite: true
+      });
+
+      var refs = that.cRefs;
+
+      tl = that.returnAnimationSteps(animation, tl);
+
+      return tl;
+    }
   },
 
   setupAnimations: function () {
@@ -345,7 +385,9 @@ var QuestionDisplay = GSAP()(React.createClass({
   },
 
   resetQuestion: function () {
-    this.props.emit('questionState', 'reset');
+    // this.props.emit('questionState', 'reset');
+
+    this.playAnimation('reset');
   },
 
   render: function () {
@@ -363,8 +405,10 @@ var QuestionDisplay = GSAP()(React.createClass({
 
     var wrapperStyle = {paddingBottom: (question.imgs.mix.aspectRatio*100) + "%"};
 
+    console.log(this);
+
     return (
-      <div className={"question-wrapper question-state-"}>
+      <div className={"question-wrapper question-state-" + this.props.questionState.current}>
         <div className="title-wrapper">
           <h2>Question {question.humanId}</h2>
         </div>
