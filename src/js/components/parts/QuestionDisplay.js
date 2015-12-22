@@ -8,6 +8,7 @@ var $ = require('../../vendor/jquery-1.11.3.min');
 var TimelineLite = require('../../vendor/greensock-js/src/uncompressed/TimelineLite');
 var TweenLite = require('../../vendor/greensock-js/src/uncompressed/TweenLite');
 var CSSPlugin = require('../../vendor/greensock-js/src/uncompressed/plugins/CSSPlugin');
+require('../../vendor/greensock-js/src/uncompressed/easing/EasePack');
 
 var QuestionDisplay = GSAP()(React.createClass({
 
@@ -55,6 +56,12 @@ var QuestionDisplay = GSAP()(React.createClass({
     if (newQuestionState.target === 'question') {
       this.playAnimation('question');
     }
+    if (newQuestionState.target === 'end') {
+      this.playAnimation('end');
+    }
+    if (newQuestionState.target === 'reset') {
+      this.playAnimation('reset');
+    }
 
     // setTimeout(function () {
     //   if (newQuestionState.target === 'end') {
@@ -76,13 +83,7 @@ var QuestionDisplay = GSAP()(React.createClass({
   },
 
   updateQuestionState: function (nextState) {
-    // console.log(nextState.questionState);
-    // console.log(this.refs);
-    // console.log(this.state.tl);
 
-    
-
-    // this.state.tl.play();
   },
 
   handleResize: function(e) {
@@ -96,17 +97,6 @@ var QuestionDisplay = GSAP()(React.createClass({
   currentAnimation: null,
 
   playAnimation: function (animation) {
-    // _.forEach(this.animations, function (thisAnimation, key) {
-    //   thisAnimation.pause();
-    // });
-    // if (this.animations[animation]) {
-    //   console.log('play', animation);
-    //   this.animations[animation].restart();
-    // }
-    // if (animation === 'ready') {
-    //   this.animations.ready.play();
-    // }
-
     if (this.currentAnimation) {
       this.currentAnimation.kill();
       this.currentAnimation = null;
@@ -117,10 +107,6 @@ var QuestionDisplay = GSAP()(React.createClass({
   },
 
   stopAllAnimations: function () {
-    // _.forEach(this.animations, function (thisAnimation, key) {
-    //   thisAnimation.pause();
-    // });
-
     if (this.currentAnimation) {
       this.currentAnimation.kill();
       this.currentAnimation = null;
@@ -129,81 +115,128 @@ var QuestionDisplay = GSAP()(React.createClass({
 
   returnAnimationSteps: function (animation, tl) {
 
-    // return tl;
+    var animationTime = 0.75;
 
-    var animationSettings = {};
     var refs = this.cRefs;
 
     if (animation === 'ready') {
+      var animationSettings = {};
       animationSettings.abWrapperPos = 0;
       animationSettings.aPos = 0;
       animationSettings.bPos = 0;
       animationSettings.questionOpacity = 0.3;
       animationSettings.answerOpacity = 0;
+      animationSettings.fadeOn = 'start';
+      animationSettings.fadeTime = animationTime;
+      animationSettings.animationTime = animationTime;
     }
     if (animation === 'question') {
+      var animationSettings = {};
       animationSettings.abWrapperPos = 0;
       animationSettings.aPos = 0;
       animationSettings.bPos = 0;
       animationSettings.questionOpacity = 1;
       animationSettings.answerOpacity = 0;
+      animationSettings.fadeOn = 'start';
+      animationSettings.fadeTime = animationTime;
+      animationSettings.animationTime = animationTime;
     }
     if (animation === 'answer') {
+      var animationSettings = {};
       animationSettings.abWrapperPos = 0;
       animationSettings.aPos = -50;
       animationSettings.bPos = 50;
       animationSettings.questionOpacity = 1;
       animationSettings.answerOpacity = 1;
+      animationSettings.fadeOn = 'reveal';
+      animationSettings.fadeTime = animationTime * 2;
+      animationSettings.animationTime = animationTime;
     }
     if (animation === 'end') {
+      var animationSettings = {};
       animationSettings.abWrapperPos = 100;
-      animationSettings.aPos = -50;
-      animationSettings.bPos = 50;
+      animationSettings.aPos = 0;
+      animationSettings.bPos = 0;
       animationSettings.questionOpacity = 0.3;
       animationSettings.answerOpacity = 1;
+      animationSettings.fadeOn = 'reveal';
+      animationSettings.fadeTime = 0;
+      animationSettings.animationTime = animationTime;
     }
 
-    console.log('animationSettings', animationSettings);
+    if (!animationSettings) {
 
-    tl
-      .add('start')
+      if (animation === 'reset') {
+        tl.set(refs.abWrapper, {transform: null})
+          .set(refs.aWrapper, {transform: null})
+          .set(refs.bWrapper, {transform: null})
+          .set(refs.imgA, {opacity: null})
+          .set(refs.imgB, {opacity: null})
+          .set(refs.imgAMix, {opacity: null})
+          .set(refs.imgBMix, {opacity: null})
+      }
+      return tl;
+    }
+
+    tl.add('start')
       
-      // .set(refs.abWrapper, {
-      //   transform: $(refs.abWrapper).css('transform')
-      // }, 'start')
-      .to(refs.abWrapper, 1, {
-        transform: 'translateX(' + animationSettings.abWrapperPos + '%)',
+      .set(refs.abWrapper, {
+        transform: $(refs.abWrapper).css('transform'),
+      }, 'start')
+      .to(refs.abWrapper, animationSettings.animationTime, {
+        x: animationSettings.abWrapperPos + '%',
+        ease: Power2.easeInOut
       }, 'start')
 
-      // .set(refs.aWrapper, {
-      //   transform: $(refs.aWrapper).css('transform')
-      // }, 'start')
-      .from(refs.aWrapper, 1, {
-        transform: 'translateX(' + animationSettings.aPos + '%)',
-        // xPercent: animationSettings.aPos,
+      .set(refs.aWrapper, {
+        transform: $(refs.aWrapper).css('transform'),
+      }, 'start')
+      .to(refs.aWrapper, animationSettings.animationTime, {
+        x: animationSettings.aPos + '%',
+        ease: Power2.easeInOut
       }, 'start')
       
-      // .set(refs.bWrapper, {
-      //   transform: $(refs.bWrapper).css('transform')
-      // }, 'start')
-      .from(refs.bWrapper, 1, {
-        transform: 'translateX(' + animationSettings.bPos + '%)',
-        // xPercent: animationSettings.bPos,
+      .set(refs.bWrapper, {
+        transform: $(refs.bWrapper).css('transform'),
       }, 'start')
-      
-      // .set(refs.imgAMix, {
-      //   transform: $(refs.imgAMix).css('opacity')
-      // }, 'start')
-      // .to(refs.imgAMix, 1, {
-      //   autoAlpha: 0,
-      // }, 'start')
+      .to(refs.bWrapper, animationSettings.animationTime, {
+        x: animationSettings.bPos + '%',
+        ease: Power2.easeInOut
+      }, 'start');
 
-      // .set(refs.imgBMix, {
-      //   transform: $(refs.imgBMix).css('opacity')
-      // }, 'start')
-      // .to(refs.imgBMix, 1, {
-      //   autoAlpha: 0,
-      // }, 'start');
+      .add('reveal')
+
+      .set(refs.imgA, {
+        opacity: $(refs.imgA).css('opacity')
+      }, 'start')
+      .to(refs.imgA, animationSettings.fadeTime, {
+        opacity: animationSettings.questionOpacity,
+        ease: Power2.easeInOut
+      }, animationSettings.fadeOn)
+
+      .set(refs.imgB, {
+        opacity: $(refs.imgB).css('opacity')
+      }, 'start')
+      .to(refs.imgB, animationSettings.fadeTime, {
+        opacity: animationSettings.questionOpacity,
+        ease: Power2.easeInOut
+      }, animationSettings.fadeOn)
+      
+      .set(refs.imgAMix, {
+        opacity: $(refs.imgAMix).css('opacity')
+      }, 'start')
+      .to(refs.imgAMix, animationSettings.fadeTime, {
+        opacity: animationSettings.answerOpacity,
+        ease: Power2.easeInOut
+      }, animationSettings.fadeOn)
+
+      .set(refs.imgBMix, {
+        opacity: $(refs.imgBMix).css('opacity')
+      }, 'start')
+      .to(refs.imgBMix, animationSettings.fadeTime, {
+        opacity: animationSettings.answerOpacity,
+        ease: Power2.easeInOut
+      }, animationSettings.fadeOn);
 
     return tl;
   },
@@ -220,102 +253,12 @@ var QuestionDisplay = GSAP()(React.createClass({
     var refs = this.cRefs;
 
     tl = this.returnAnimationSteps(animation, tl);
-    console.log(tl);
-
-    // tl
-    //   .add('start')
-      
-    //   .set(refs.abWrapper, {
-    //     transform: $(refs.abWrapper).css('transform')
-    //   }, 'start')
-    //   .to(refs.abWrapper, 1, {
-    //     transform: 'translateX(0%)',
-    //   }, 'start')
-
-    //   .set(refs.aWrapper, {
-    //     transform: $(refs.aWrapper).css('transform')
-    //   }, 'start')
-    //   .to(refs.aWrapper, 1, {
-    //     // transform: 'translateX(50%)',
-    //     xPercent: 50
-    //   }, 'start')
-      
-    //   .set(refs.bWrapper, {
-    //     transform: $(refs.bWrapper).css('transform')
-    //   }, 'start')
-    //   .to(refs.bWrapper, 1, {
-    //     // transform: 'translateX(50%)',
-    //     xPercent: 50
-    //   }, 'start')
 
     return tl;
   },
 
   setupAnimations: function () {
-    // var refs = this.cRefs;
-
-    // console.log('setup aimations', refs, this);
-
-    // var animationEndCallback = function () {
-    //   console.log('arguments', arguments);
-    // };
-
-    // this.animations.ready = this.addAnimation(function () {
-    //   return new TimelineLite({
-    //     paused: true,
-    //     onComplete: animationEndCallback
-    //   })
-    //   .to(refs.abWrapper, 1, {
-    //     xPercent: 100,
-    //   });
-    // });
-
-    // this.animations.question = this.addAnimation(function () {
-    //   return new TimelineLite({
-    //     paused: true,
-    //     onComplete: animationEndCallback
-    //   })
-    //   .add('start')
-    //   .to(refs.abWrapper, 1, {
-    //     xPercent: 100,
-    //   }, 'start')
-    //   .to(refs.aWrapper, 1, {
-    //     xPercent: 0,
-    //   }, 'start')
-    //   .to(refs.bWrapper, 1, {
-    //     xPercent: 0,
-    //   }, 'start')
-    //   .to(refs.imgAMix, 1, {
-    //     opacity: 0,
-    //   }, 'start')
-    //   .to(refs.imgBMix, 1, {
-    //     opacity: 0,
-    //   }, 'start');
-    // });
-
-    // this.animations.answer = this.addAnimation(function () {
-    //   return new TimelineLite({
-    //     paused: true,
-    //     onComplete: animationEndCallback
-    //   })
-    //   .add('start')
-    //   .to(refs.abWrapper, 1, {
-    //     xPercent: 100,
-    //   }, 'start')
-    //   .to(refs.aWrapper, 1, {
-    //     xPercent: -50,
-    //   }, 'start')
-    //   .to(refs.bWrapper, 1, {
-    //     xPercent: 50,
-    //   }, 'start')
-    //   .add('reveal')
-    //   .to(refs.imgAMix, 1, {
-    //     opacity: 1,
-    //   }, 'reveal')
-    //   .to(refs.imgBMix, 1, {
-    //     opacity: 1,
-    //   }, 'reveal');
-    // });
+    
   },
 
   componentDidMount: function() {
@@ -397,6 +340,14 @@ var QuestionDisplay = GSAP()(React.createClass({
     this.props.emit('questionState', 'ready');
   },
 
+  endQuestion: function () {
+    this.props.emit('questionState', 'end');
+  },
+
+  resetQuestion: function () {
+    this.props.emit('questionState', 'reset');
+  },
+
   render: function () {
     var question = this.props.question;
     var imgs = this.state.imgs;
@@ -451,6 +402,8 @@ var QuestionDisplay = GSAP()(React.createClass({
           <button onClick={this.showQuestion}>Question</button>
           <button onClick={this.showAnswer}>Answer</button>
           <button onClick={this.stopAllAnimations}>stopAllAnimations</button>
+          <button onClick={this.endQuestion}>endQuestion</button>
+          <button onClick={this.resetQuestion}>resetQuestion</button>
         </nav>
       </div>
     );
