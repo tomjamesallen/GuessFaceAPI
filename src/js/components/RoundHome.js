@@ -62,7 +62,7 @@ var RoundHome = React.createClass({
 
         <div><Link to={'/round/' + round.humanId + '/index'}>Round Index</Link></div>
         <div><Link to={'/round/' + round.humanId + '/example'}>Round Example</Link></div>
-        <div><Link to={'/round/' + round.humanId + '/question/1'}>Start Round</Link></div>
+        <Display if={!hasQuestionId}><Link to={'/round/' + round.humanId + '/question/1'}>Start Round</Link></Display>
       </div>
     );
   }

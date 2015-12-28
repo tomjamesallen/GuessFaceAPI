@@ -1,3 +1,10 @@
+.bp-helper {
+  display: none;
+  content: 'mobile'; }
+  @media (min-width: 700px) and (min-height: 600px) {
+    .bp-helper {
+      content: 'desktop'; } }
+
 /*! normalize-scss | MIT/GPLv2 License | bit.ly/normalize-scss */
 /**
      * 1. Set default font family to sans-serif.
@@ -481,7 +488,6 @@ html {
 
 .question-wrapper .a-b-wrapper {
   position: relative;
-  padding-bottom: 50%;
   overflow: hidden;
   -webkit-transform: translateX(-100%);
       -ms-transform: translateX(-100%);
@@ -493,6 +499,9 @@ html {
     /* 2 */ }
   .question-wrapper .a-b-wrapper:after {
     clear: both; }
+  @media (min-width: 700px) and (min-height: 600px) {
+    .question-wrapper .a-b-wrapper {
+      padding-bottom: 50%; } }
 
 @media (min-width: 700px) and (min-height: 600px) {
   .question-wrapper .a-wrapper,
@@ -530,7 +539,8 @@ html {
 .question-wrapper .mobile-question-only-wrapper {
   position: relative;
   margin-bottom: 32px;
-  margin-bottom: 2rem; }
+  margin-bottom: 2rem;
+  opacity: 0; }
   @media (min-width: 700px) and (min-height: 600px) {
     .question-wrapper .mobile-question-only-wrapper {
       display: none; } }

@@ -53,7 +53,7 @@ var RoundExample = React.createClass({
     
     return (
       <div>
-        <QuestionDisplay question={question} questionState={this.props.state.questionState} emit={this.props.emit}/>
+        <QuestionDisplay question={question} questionState={this.props.state.questionState} emit={this.props.emit} layout={this.props.state.layout}/>
         <Link to={link}>Start Round</Link>
       </div>
     );

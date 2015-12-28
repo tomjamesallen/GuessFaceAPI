@@ -3,3 +3,5 @@ design
 # Excluding questions for development.
 *.png
 *.jpg
+*.sublime-project
+*.sublime-workspace

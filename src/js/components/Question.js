@@ -95,7 +95,7 @@ var Question = React.createClass({
 
     return (
       <div>
-        <QuestionDisplay question={question} questionState={this.props.state.questionState} emit={this.props.emit}/>
+        <QuestionDisplay question={question} questionState={this.props.state.questionState} emit={this.props.emit} layout={this.props.state.layout}/>
         <PrevNext question={question} round={round} />
       </div>
     );

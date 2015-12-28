@@ -1,6 +1,7 @@
 var React = require('react');
 var Router = require('react-router');
 var $ = require('../vendor/jquery-1.11.3.min.js');
+var debounce = require('debounce');
 var Display = require('./parts/Display');
 var Link = require('react-router').Link;
 
@@ -11,6 +12,7 @@ var APP = React.createClass({
   },
 
   getInitialState: function () {
+    var layout = this.getCurrentLayout(true);
     return {
       data: null,
       error: false,
@@ -23,8 +25,35 @@ var APP = React.createClass({
         target: false
       },
       storedTransiton: null,
+      layout: layout,
     }
   },
+
+  getCurrentLayout: function (returnOnly) {
+    var returnOnly = returnOnly || false;
+    var $bpHelper = $('.bp-helper');
+    if (!$bpHelper.length) return;
+    var currentLayout = $bpHelper
+      .css('content')
+      .replace(/'/gi, '')
+      .replace(/"/gi, '');
+
+    if (returnOnly) {
+      return currentLayout;
+    }
+
+    if (currentLayout !== this.state.layout) {
+      this.setState({
+        layout: currentLayout
+      });
+    }
+  },
+
+  handleResize: function(e) {
+    this.getCurrentLayout();
+  },
+
+  debouncedResize: null,
 
   componentWillUpdate: function (nextProps, nextState) {
     // Watch for data loading.
@@ -61,7 +90,6 @@ var APP = React.createClass({
 
     if (type === 'retryTransition') {
       if (this.state.storedTransiton) {
-        console.log('retryTransition', this.state.storedTransiton);
         this.context.history.pushState(null, this.state.storedTransiton.pathname);
         this.setState({
           storedTransiton: null,
@@ -84,6 +112,13 @@ var APP = React.createClass({
         error: 'Unable to load questions.'
       })
     });
+
+    this.debouncedResize = debounce(this.handleResize, 200);
+    window.addEventListener('resize', this.debouncedResize);
+  },
+
+  componentWillUnmount: function() {
+    window.removeEventListener('resize', this.debouncedResize);
   },
 
   render: function () {
@@ -93,7 +128,7 @@ var APP = React.createClass({
           <h1>Error: {this.state.error}</h1>
         </Display>
         <Display if={!this.state.data && !this.state.error}>
-          <h1>Data loading</h1>
+          <h1>Loading...</h1>
         </Display>
         <Link to="/">Home</Link>
         {this.state.data ? React.cloneElement(this.props.children, {state: this.state, emit: this.emit}) : null}

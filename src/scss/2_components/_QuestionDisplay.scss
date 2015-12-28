@@ -1,10 +1,13 @@
 .question-wrapper {
   .a-b-wrapper {
     @include cf;
-    position: relative;
-    padding-bottom: 50%;
+    position: relative;    
     overflow: hidden;
     transform: translateX(-100%);
+
+    @include desktop {
+      padding-bottom: 50%;
+    }
   }
   .a-wrapper,
   .b-wrapper {
@@ -53,6 +56,7 @@
   .mobile-question-only-wrapper {
     position: relative;
     margin-bottom: $gutter;
+    opacity: 0;
 
     @include desktop {
       display: none;

@@ -17,7 +17,6 @@ var QuestionDisplay = GSAP()(React.createClass({
   getInitialState: function () {
     return {
       imgs: null,
-      // questionState: 'start' // start/question/answer
     }
   },
 
@@ -115,9 +114,9 @@ var QuestionDisplay = GSAP()(React.createClass({
   },
 
   returnAnimationSteps: function (animation, tl) {
-
+    
+    var layout = this.props.layout;
     var animationTime = 0.75;
-
     var refs = this.cRefs;
 
     if (animation === 'ready') {
@@ -126,6 +125,7 @@ var QuestionDisplay = GSAP()(React.createClass({
       animationSettings.aPos = 0;
       animationSettings.bPos = 0;
       animationSettings.questionOpacity = 0;
+      animationSettings.mobileQuestionOpacity = 0;
       animationSettings.answerOpacity = 0;
       animationSettings.fadeOn = 'start';
       animationSettings.fadeTime = animationTime;
@@ -136,7 +136,9 @@ var QuestionDisplay = GSAP()(React.createClass({
       animationSettings.abWrapperPos = 0;
       animationSettings.aPos = 0;
       animationSettings.bPos = 0;
-      animationSettings.questionOpacity = 1;
+      if (layout === 'mobile') animationSettings.questionOpacity = 0;
+      else animationSettings.questionOpacity = 1;
+      animationSettings.mobileQuestionOpacity = 1;
       animationSettings.answerOpacity = 0;
       animationSettings.fadeOn = 'start';
       animationSettings.fadeTime = animationTime;
@@ -145,11 +147,20 @@ var QuestionDisplay = GSAP()(React.createClass({
     if (animation === 'answer') {
       var animationSettings = {};
       animationSettings.abWrapperPos = 0;
-      animationSettings.aPos = -50;
-      animationSettings.bPos = 50;
-      animationSettings.questionOpacity = 1;
+      if (layout === 'mobile') {
+        animationSettings.aPos = 0;
+        animationSettings.bPos = 0;
+        animationSettings.fadeOn = 'start';
+        animationSettings.questionOpacity = 0;
+      }
+      else {
+        animationSettings.aPos = -50;
+        animationSettings.bPos = 50;
+        animationSettings.fadeOn = 'reveal';
+        animationSettings.questionOpacity = 1;
+      }
+      animationSettings.mobileQuestionOpacity = 1;
       animationSettings.answerOpacity = 1;
-      animationSettings.fadeOn = 'reveal';
       animationSettings.fadeTime = animationTime * 2;
       animationSettings.animationTime = animationTime;
     }
@@ -158,15 +169,16 @@ var QuestionDisplay = GSAP()(React.createClass({
       animationSettings.abWrapperPos = 100;
       animationSettings.aPos = 0;
       animationSettings.bPos = 0;
-      animationSettings.questionOpacity = 0.3;
+      animationSettings.questionOpacity = 0;
+      animationSettings.mobileQuestionOpacity = 0;
       animationSettings.answerOpacity = 1;
-      animationSettings.fadeOn = 'reveal';
+      if (layout === 'mobile') animationSettings.fadeOn = 'start';
+      else animationSettings.fadeOn = 'reveal';
       animationSettings.fadeTime = 0;
       animationSettings.animationTime = animationTime;
     }
 
     if (!animationSettings) {
-
       if (animation === 'reset') {
         tl.set(refs.abWrapper, {clearProps:"all"})
           .set(refs.aWrapper, {clearProps:"all"})
@@ -205,9 +217,19 @@ var QuestionDisplay = GSAP()(React.createClass({
         ease: Power2.easeInOut
       }, 'start')
 
-      .add('reveal')
+    tl.add('reveal');
 
-      .set(refs.imgA, {
+    if (refs.imgMix && refs.imgMix.clientWidth) {
+      tl.set(refs.imgMix, {
+          opacity: $(refs.imgMix).css('opacity')
+        }, 'start')
+        .to(refs.imgMix, animationSettings.fadeTime, {
+          opacity: animationSettings.mobileQuestionOpacity,
+          ease: Power2.easeInOut
+        }, animationSettings.fadeOn);
+    }
+
+    tl.set(refs.imgA, {
         opacity: $(refs.imgA).css('opacity')
       }, 'start')
       .to(refs.imgA, animationSettings.fadeTime, {
@@ -288,8 +310,6 @@ var QuestionDisplay = GSAP()(React.createClass({
   componentWillUnmount: function() {
     window.removeEventListener('resize', this.debouncedResize);
 
-    console.log(this);
-
     if (this.currentAnimation) {
       this.currentAnimation.kill();
       this.currentAnimation = null;
@@ -315,6 +335,9 @@ var QuestionDisplay = GSAP()(React.createClass({
   getBestImg: function (which, ref, question) {
     var question = question|| this.props.question;
     var el = this.cRefs[ref];
+
+    if (!el) return '';
+    if (!el.clientWidth) return '';
 
     var elWidth = el.clientWidth;
     var imgsArray = question.imgs[which].srcs;
@@ -380,7 +403,11 @@ var QuestionDisplay = GSAP()(React.createClass({
       var imgMix = this.state.imgs.imgMix;
     }
 
-    var wrapperStyle = {paddingBottom: (question.imgs.mix.aspectRatio*100) + "%"};
+    var wrapperStyle = {paddingBottom: (question.imgs.mix.aspectRatio * 100) + '%'};
+
+    if (this.props.layout !== 'mobile') {
+      this.cRefs.imgMix = null;
+    }
 
     return (
       <div className={"question-wrapper question-state-" + this.props.questionState.current}>
@@ -389,9 +416,11 @@ var QuestionDisplay = GSAP()(React.createClass({
         </div>
 
         <div className="a-b-wrapper" ref={function (el) {that.cRefs.abWrapper = el}}>
-          <div className="mobile-question-only-wrapper" style={wrapperStyle} ref={function (el) {that.cRefs.imgMix = el}}>
-            <Display if={imgs}><img src={imgMix} /></Display>
-          </div>
+          <Display if={this.props.layout === 'mobile'}>
+            <div className="mobile-question-only-wrapper" style={wrapperStyle} ref={function (el) {that.cRefs.imgMix = el}}>
+              <Display if={imgs}><img src={imgMix} /></Display>
+            </div>
+          </Display>
 
           <div className="a-wrapper" ref={function (el) {that.cRefs.aWrapper = el}}>
             <div className="imgs-wrapper" style={wrapperStyle}>
@@ -417,8 +446,18 @@ var QuestionDisplay = GSAP()(React.createClass({
         </div>
 
         <nav className="navigation-wrapper">
-          <button onClick={this.showQuestion}>Question</button>
-          <button onClick={this.showAnswer}>Answer</button>
+          <Display 
+            className="button-wrapper"
+            if={this.props.questionState.target === 'ready' ||
+                this.props.questionState.target === 'answer'}>
+            <button onClick={this.showQuestion}>Question</button>
+          </Display>
+          
+          <Display 
+            className="button-wrapper"
+            if={this.props.questionState.target === 'question'}>
+            <button onClick={this.showAnswer}>Answer</button>
+          </Display>          
         </nav>
       </div>
     );
