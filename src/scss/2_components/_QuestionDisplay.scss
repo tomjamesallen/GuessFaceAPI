@@ -13,6 +13,7 @@
 }
 
 .question-wrapper {
+  padding: $gutter/2;
   .a-b-wrapper {
     @include cf;
     position: relative;    
