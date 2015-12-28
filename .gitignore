@@ -1,7 +1,7 @@
 node_modules
 design
 # Excluding questions for development.
-api/*.png
-api/*.jpg
+*.png
+*.jpg
 *.sublime-project
 *.sublime-workspace

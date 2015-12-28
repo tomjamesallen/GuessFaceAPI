@@ -123,15 +123,17 @@ var APP = React.createClass({
 
   render: function () {
     return (
-      <div>
-        <Display if={this.state.error}>
-          <h1>Error: {this.state.error}</h1>
-        </Display>
-        <Display if={!this.state.data && !this.state.error}>
-          <h1>Loading...</h1>
-        </Display>
-        <Link to="/">Home</Link>
-        {this.state.data ? React.cloneElement(this.props.children, {state: this.state, emit: this.emit}) : null}
+      <div className="app-wrapper-outer">
+        <div className="app-wrapper">
+          <Display if={this.state.error}>
+            <h1>Error: {this.state.error}</h1>
+          </Display>
+          <Display if={!this.state.data && !this.state.error}>
+            <h1>Loading...</h1>
+          </Display>
+          <Link to="/">Home</Link>
+          {this.state.data ? React.cloneElement(this.props.children, {state: this.state, emit: this.emit}) : null}
+        </div>
       </div>
     );
   }

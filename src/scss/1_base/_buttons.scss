@@ -1,0 +1,28 @@
+button, .button {
+  background-color: $secondary;
+  border: none;
+  border-radius: 1px;
+  margin-right: 0.5rem;
+  padding: $gutter/4 $gutter/2;
+
+  transition: all 2ms $animation-easing;
+
+  outline: none;
+
+  @include img-shadow;
+
+  &.button-inactive {
+    background-color: $grey;
+  }
+}
+
+button {
+  &:active {
+    transform: translate(1px, 1px);
+    @include no-shadow;
+  }
+}
+
+a.button {
+  text-decoration: none;
+}

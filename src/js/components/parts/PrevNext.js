@@ -59,9 +59,9 @@ var PrevNext = React.createClass({
 
     return (
       <div className="prev-next">
-        {first ? <Link to={first}>First</Link> : <span>First</span>}
-        {prev ? <Link to={prev}>Prev</Link> : <span>Prev</span>}
-        {next ? <Link to={next}>Next</Link> : <span>Next</span>}
+        {first ? <Link to={first} className="button">First</Link> : <span className="button button-inactive">First</span>}
+        {prev ? <Link to={prev} className="button">Prev</Link> : <span className="button button-inactive">Prev</span>}
+        {next ? <Link to={next} className="button">Next</Link> : <span className="button button-inactive">Next</span>}
       </div>
     );
   }

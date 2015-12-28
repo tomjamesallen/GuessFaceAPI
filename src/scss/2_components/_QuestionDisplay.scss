@@ -1,5 +1,5 @@
 @mixin questionMark {
-  background-color: $tertiary;
+  background-color: $secondary;
   &:before {
     content: '?';
     display: block;
@@ -13,8 +13,11 @@
 }
 
 .question-wrapper {
-  padding: $gutter/2;
+  // padding: $gutter/2;
   .a-b-wrapper {
+    margin-left: -$gutter/2;
+    margin-right: -$gutter/2;
+    width: auto;
     @include cf;
     position: relative;    
     overflow: hidden;
@@ -52,8 +55,12 @@
   .imgs-wrapper {
     position: relative;
     margin-bottom: $gutter;
+    overflow: hidden;
+    border-radius: 3px;
+    display: block;
     
     @include questionMark;
+    @include img-shadow;
 
     .img-wrapper {
       opacity: 0;
@@ -70,7 +77,11 @@
   }
 
   .mobile-question-only-wrapper-outer {
+    border-radius: 3px;
+    overflow: hidden;
+    display: block;
     @include questionMark;
+    @include img-shadow;
   }
 
   .mobile-question-only-wrapper {
