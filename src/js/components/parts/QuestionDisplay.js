@@ -416,7 +416,7 @@ var QuestionDisplay = GSAP()(React.createClass({
         </div>
 
         <div className="a-b-wrapper" ref={function (el) {that.cRefs.abWrapper = el}}>
-          <Display if={this.props.layout === 'mobile'}>
+          <Display className="mobile-question-only-wrapper-outer" if={this.props.layout === 'mobile'}>
             <div className="mobile-question-only-wrapper" style={wrapperStyle} ref={function (el) {that.cRefs.imgMix = el}}>
               <Display if={imgs}><img src={imgMix} /></Display>
             </div>
