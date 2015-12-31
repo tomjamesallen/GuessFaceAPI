@@ -17,6 +17,7 @@ var QuestionDisplay = GSAP()(React.createClass({
   getInitialState: function () {
     return {
       imgs: null,
+      questionWrapperStyle: {}
     }
   },
 
@@ -87,6 +88,7 @@ var QuestionDisplay = GSAP()(React.createClass({
 
   handleResize: function(e) {
     this.calculateBestImgs();
+    this.updateWrapperWidth();
   },
 
   debouncedResize: null,
@@ -166,7 +168,7 @@ var QuestionDisplay = GSAP()(React.createClass({
     }
     if (animation === 'end') {
       var animationSettings = {};
-      animationSettings.abWrapperPos = 100;
+      animationSettings.abWrapperPos = 150;
       animationSettings.aPos = 0;
       animationSettings.bPos = 0;
       animationSettings.questionOpacity = 0;
@@ -294,11 +296,9 @@ var QuestionDisplay = GSAP()(React.createClass({
   },
 
   componentDidMount: function() {
-    // console.log(this);
+    this.updateWrapperWidth();
     this.debouncedResize = debounce(this.handleResize, 200);
     window.addEventListener('resize', this.debouncedResize);
-
-    // this.setupAnimations();
   },
 
   componentWillReceiveProps: function (nextProps) {
@@ -390,6 +390,68 @@ var QuestionDisplay = GSAP()(React.createClass({
     this.playAnimation('reset');
   },
 
+  updateWrapperWidth: function () {
+    var question = this.props.question;
+    var questionWrapperStyle = this.returnWrapperStyles(question.imgs.mix.aspectRatio);
+    
+    if (questionWrapperStyle) {
+      this.setState({
+        questionWrapperStyle: questionWrapperStyle
+      });
+    }
+    else {
+      this.setState({
+        questionWrapperStyle: {}
+      });
+    }
+  },
+
+  returnWrapperStyles: function (imgAspect) {
+
+    if (this.props.layout !== 'desktop') return null;
+
+    var that = this;
+
+    // imgAspect is the percentage that the height of the image is of the width.
+    // For example, an image that is 1h x 2w is half as tall as it is wide,
+    // therefore the imgAspect would be 0.5.
+
+    // When calculating the width we need to take into account the padding.
+
+    // We need to calculate the width of the wrapper based on the aspect ratio
+    // of the images.
+    // We want the images to take up no more than 100% the height minus the
+    // header and button areas.
+
+    var $wrapper = $(that.cRefs.questionWrapper);
+    var availableWidth = $wrapper.parent().outerWidth();
+
+    // We need the aspect for two images side by side, so half the imgAspect.
+    var imgAspect = imgAspect / 2;
+
+    var headerAreaHeight = $wrapper.offset().top;
+    var buttonAreaHeight = 100; // [placeholder]
+    var heightCompensation = 00;
+
+    var windowHeight = $(window).outerHeight();
+
+    var availableHeight = windowHeight - 
+                            headerAreaHeight -
+                            buttonAreaHeight -
+                            heightCompensation;
+
+    var widthToAchieveHeightAtAspect = availableHeight / imgAspect;
+
+    var questionStateWidth = Math.floor((widthToAchieveHeightAtAspect / availableWidth) * 100);
+    if (questionStateWidth > 100) questionStateWidth = 100;
+    var questionStateMarginLeft = (100 - questionStateWidth) / 2;
+
+    return {
+      width: questionStateWidth + '%',
+      marginLeft: questionStateMarginLeft + '%'
+    }
+  },
+
   render: function () {
     var question = this.props.question;
     var imgs = this.state.imgs;
@@ -410,7 +472,7 @@ var QuestionDisplay = GSAP()(React.createClass({
     }
 
     return (
-      <div className={"question-wrapper question-state-" + this.props.questionState.current}>
+      <div className={"question-wrapper question-state-" + this.props.questionState.current} ref={function (el) {that.cRefs.questionWrapper = el}} style={this.state.questionWrapperStyle}>
         <div className="title-wrapper">
           <h2>Question {question.humanId}</h2>
         </div>

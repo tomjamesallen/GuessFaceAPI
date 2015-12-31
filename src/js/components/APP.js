@@ -25,7 +25,7 @@ var APP = React.createClass({
         target: false
       },
       storedTransiton: null,
-      layout: layout,
+      layout: layout
     }
   },
 
