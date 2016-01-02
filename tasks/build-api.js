@@ -14,11 +14,16 @@ fs.deleteFolderRecursive = require('./helpers/deleteFolderRecursive');
 var defaults = {
   imageOutputDir : "dist/api/imgs",
   imgSizes: [320, 640, 960],
-  imgFormat: 'jpg'
+  imgFormat: 'jpg',
+  imThreadConcurrency: 50,
 };
 
 // Get extend defaults with config in build-api-config.json.
 var config = extend({}, defaults, require('../build-api-config.json'));
+
+// Set up threadManager.
+var threadManager_imIdentify = require('./helpers/ThreadManager')(config.imThreadConcurrency);
+var threadManager_imResize = require('./helpers/ThreadManager')(config.imThreadConcurrency);
 
 /**
  * Top level function for building API.
@@ -26,6 +31,7 @@ var config = extend({}, defaults, require('../build-api-config.json'));
  * Generates JSON API and image variants.
  */
 var buildApiMaster = function () {
+
   // Require master question data file from src.
   var questionsData = require('../src/questions/index.json');
 
@@ -288,24 +294,30 @@ var createImageVariants = function (imgPath, distDir, imgName, roundId, question
       // Create full img path including extension.
       var imgFilePath = imgPath + '.' + imgType;
 
-      // Use image magick to identify the file and return the metadata.
-      im.identify(imgFilePath, function(err, metadata){
+      threadManager_imIdentify.newThread(function (thread) {
 
-        // If metadata found then save and resolve promise.
-        if (typeof metadata !== 'undefined') {
-          
-          // Save the data we'll need to the imgFileData object.
-          imgFileData.metadata = metadata;
-          imgFileData.path = imgFilePath;
-          imgFileData.imgName = imgName;
+        // Use image magick to identify the file and return the metadata.
+        im.identify(imgFilePath, function(err, metadata){
 
-          // Resolve the promise for this file type.
-          foundImgPromises[imgType].resolve();
-        }
-        else {
-          // If no metadata is found reject the promise.
-          foundImgPromises[imgType].reject(new Error('No metadata'));
-        }
+          // If metadata found then save and resolve promise.
+          if (typeof metadata !== 'undefined') {
+            
+            // Save the data we'll need to the imgFileData object.
+            imgFileData.metadata = metadata;
+            imgFileData.path = imgFilePath;
+            imgFileData.imgName = imgName;
+
+            // Resolve the promise for this file type.
+            foundImgPromises[imgType].resolve();
+          }
+          else {
+            // If no metadata is found reject the promise.
+            foundImgPromises[imgType].reject(new Error('No metadata'));
+          }
+
+          thread.resolve();
+        });
+
       });
     }
     catch (e) {
@@ -385,34 +397,38 @@ var createImageVariant = function (srcImg, outputDir, size) {
         srcImg.imgName + '_' + size +
         '.' + config.imgFormat;
 
-    // Resize img to size.
-    im.resize({
-      srcData: imgData,
-      width: size,
-      format: config.imgFormat
-    }, function(err, stdout, stderr) {
-      
-      // Reject promise if im.resize returns an error.
-      if (err) {
-        variantProcessedPromise.reject(new Error(err));
-        return;
-      }
+    threadManager_imResize.newThread(function (thread) {
+      // Resize img to size.
+      im.resize({
+        srcData: imgData,
+        width: size,
+        format: config.imgFormat
+      }, function(err, stdout, stderr) {
+        
+        // Reject promise if im.resize returns an error.
+        if (err) {
+          variantProcessedPromise.reject(new Error(err));
+          return;
+        }
 
-      // Write output of im.resize to outputFileName.
-      fs.writeFileSync(outputFileName, stdout, 'binary');
+        // Write output of im.resize to outputFileName.
+        fs.writeFileSync(outputFileName, stdout, 'binary');
 
-      // Get api file path.
-      var apiFilePath = outputFileName.split('dist/');
-      if (apiFilePath.length === 1) {
-        // Get filepath after dist/.
-        apiFilePath = apiFilePath[0];
-      }
-      else {
-        apiFilePath = '/' + apiFilePath[1];
-      }
-      
-      // Resolve variant processed promise.
-      variantProcessedPromise.resolve(apiFilePath);
+        // Get api file path.
+        var apiFilePath = outputFileName.split('dist/');
+        if (apiFilePath.length === 1) {
+          // Get filepath after dist/.
+          apiFilePath = apiFilePath[0];
+        }
+        else {
+          apiFilePath = '/' + apiFilePath[1];
+        }
+
+        thread.resolve();
+        
+        // Resolve variant processed promise.
+        variantProcessedPromise.resolve(apiFilePath);
+      });
     });
   });
 

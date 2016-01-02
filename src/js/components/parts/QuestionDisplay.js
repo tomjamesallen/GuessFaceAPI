@@ -472,36 +472,38 @@ var QuestionDisplay = GSAP()(React.createClass({
     }
 
     return (
-      <div className={"question-wrapper question-state-" + this.props.questionState.current} ref={function (el) {that.cRefs.questionWrapper = el}} style={this.state.questionWrapperStyle}>
+      <div>
         <div className="title-wrapper">
           <h2>Question {question.humanId}</h2>
         </div>
+        <div className={"question-wrapper question-state-" + this.props.questionState.current} ref={function (el) {that.cRefs.questionWrapper = el}} style={this.state.questionWrapperStyle}>
 
-        <div className="a-b-wrapper" ref={function (el) {that.cRefs.abWrapper = el}}>
-          <Display className="mobile-question-only-wrapper-outer" if={this.props.layout === 'mobile'}>
-            <div className="mobile-question-only-wrapper" style={wrapperStyle} ref={function (el) {that.cRefs.imgMix = el}}>
-              <Display if={imgs}><img src={imgMix} /></Display>
+          <div className="a-b-wrapper" ref={function (el) {that.cRefs.abWrapper = el}}>
+            <Display className="mobile-question-only-wrapper-outer" if={this.props.layout === 'mobile'}>
+              <div className="mobile-question-only-wrapper" style={wrapperStyle} ref={function (el) {that.cRefs.imgMix = el}}>
+                <Display if={imgs}><img src={imgMix} /></Display>
+              </div>
+            </Display>
+
+            <div className="a-wrapper" ref={function (el) {that.cRefs.aWrapper = el}}>
+              <div className="imgs-wrapper" style={wrapperStyle}>
+                <div className="img-wrapper img-wrapper-question" ref={function (el) {that.cRefs.imgA = el}}>
+                  <Display if={imgs}><img src={imgAMix} /></Display>
+                </div>
+                <div className="img-wrapper img-wrapper-answer" ref={function (el) {that.cRefs.imgAMix = el}}>
+                  <Display if={imgs}><img src={imgA} /></Display>
+                </div>
+              </div>
             </div>
-          </Display>
 
-          <div className="a-wrapper" ref={function (el) {that.cRefs.aWrapper = el}}>
-            <div className="imgs-wrapper" style={wrapperStyle}>
-              <div className="img-wrapper img-wrapper-question" ref={function (el) {that.cRefs.imgA = el}}>
-                <Display if={imgs}><img src={imgAMix} /></Display>
-              </div>
-              <div className="img-wrapper img-wrapper-answer" ref={function (el) {that.cRefs.imgAMix = el}}>
-                <Display if={imgs}><img src={imgA} /></Display>
-              </div>
-            </div>
-          </div>
-
-          <div className="b-wrapper" ref={function (el) {that.cRefs.bWrapper = el}}>
-            <div className="imgs-wrapper" style={wrapperStyle}>
-              <div className="img-wrapper img-wrapper-question" ref={function (el) {that.cRefs.imgB = el}}>
-                <Display if={imgs}><img src={imgBMix} /></Display>
-              </div>
-              <div className="img-wrapper img-wrapper-answer" ref={function (el) {that.cRefs.imgBMix = el}}>
-                <Display if={imgs}><img src={imgB} /></Display>
+            <div className="b-wrapper" ref={function (el) {that.cRefs.bWrapper = el}}>
+              <div className="imgs-wrapper" style={wrapperStyle}>
+                <div className="img-wrapper img-wrapper-question" ref={function (el) {that.cRefs.imgB = el}}>
+                  <Display if={imgs}><img src={imgBMix} /></Display>
+                </div>
+                <div className="img-wrapper img-wrapper-answer" ref={function (el) {that.cRefs.imgBMix = el}}>
+                  <Display if={imgs}><img src={imgB} /></Display>
+                </div>
               </div>
             </div>
           </div>
