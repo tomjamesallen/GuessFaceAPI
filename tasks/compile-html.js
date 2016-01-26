@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var config = require('../gulp-config.json').html;
 var minifyHTML = require('gulp-minify-html');
-var livereload = require('gulp-livereload');
+var connect = require('gulp-connect');
 
 gulp.task('compile:html', function () {
   gulp.src(config.src)
@@ -13,11 +13,9 @@ gulp.task('compile:html', function () {
       quotes: true,
     }))
     .pipe(gulp.dest(config.outputDir))
-    .pipe(livereload());
+    .pipe(connect.reload());
 });
 
 gulp.task('watch:html', function () {
-  livereload.listen();
-  gulp.start('compile:html');
   gulp.watch([config.src], ['compile:html']);
 });
