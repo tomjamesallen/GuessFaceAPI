@@ -1,8 +1,7 @@
 node_modules
 design
 # Excluding questions for development.
-*.png
-*.jpg
 *.sublime-project
 *.sublime-workspace
 dist
+src/questions
