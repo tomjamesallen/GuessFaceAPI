@@ -1,9 +1,9 @@
 var React = require('react');
-var QuestionsList = require('./parts/QuestionsList');
-var QuestionDisplay = require('./parts/QuestionDisplay');
+var QuestionsList = require('./QuestionsList.react');
+var QuestionDisplay = require('./QuestionDisplay.react');
 var Link = require('react-router').Link;
 var Lifecycle = require('react-router').Lifecycle;
-var QuestionRouterMixin = require('./mixins/QuestionRouterMixin');
+var QuestionRouterMixin = require('./mixins/QuestionRouterMixin.react');
 
 var RoundExample = React.createClass({
 

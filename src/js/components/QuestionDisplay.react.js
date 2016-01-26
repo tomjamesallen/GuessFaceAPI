@@ -1,14 +1,14 @@
 var React = require('react');
 var debounce = require('debounce');
-var Display = require('./Display');
+var Display = require('./helpers/Display.react');
 var _ = require('underscore');
 var GSAP = require('react-gsap-enhancer').default;
-var $ = require('../../vendor/jquery-1.11.3.min');
+var $ = require('../vendor/jquery-1.11.3.min');
 
-var TimelineMax = require('../../vendor/greensock-js/src/uncompressed/TimelineMax');
-var TweenLite = require('../../vendor/greensock-js/src/uncompressed/TweenLite');
-var CSSPlugin = require('../../vendor/greensock-js/src/uncompressed/plugins/CSSPlugin');
-require('../../vendor/greensock-js/src/uncompressed/easing/EasePack');
+var TimelineMax = require('../vendor/greensock-js/src/uncompressed/TimelineMax');
+var TweenLite = require('../vendor/greensock-js/src/uncompressed/TweenLite');
+var CSSPlugin = require('../vendor/greensock-js/src/uncompressed/plugins/CSSPlugin');
+require('../vendor/greensock-js/src/uncompressed/easing/EasePack');
 
 var QuestionDisplay = GSAP()(React.createClass({
 

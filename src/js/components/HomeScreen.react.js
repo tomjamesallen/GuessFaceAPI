@@ -1,6 +1,6 @@
 var React = require('react');
 var Link = require('react-router').Link;
-var RoundsList = require('./parts/RoundsList');
+var RoundsList = require('./RoundsList.react');
 
 var HomeScreen = React.createClass({
   render: function () {

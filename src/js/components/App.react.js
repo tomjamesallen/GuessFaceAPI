@@ -2,7 +2,7 @@ var React = require('react');
 var Router = require('react-router');
 var $ = require('../vendor/jquery-1.11.3.min.js');
 var debounce = require('debounce');
-var Display = require('./parts/Display');
+var Display = require('./helpers/Display.react');
 var Link = require('react-router').Link;
 
 var APP = React.createClass({

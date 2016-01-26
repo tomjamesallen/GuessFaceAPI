@@ -13,13 +13,13 @@ var IndexRoute = require('react-router').IndexRoute;
 // var DefaultRoute = require('react-router').DefaultRoute;
 // var NotFoundRoute = require('react-router').NotFoundRoute;
 
-var APP = require('./components/APP');
+var APP = require('./components/App.react');
 
-var HomeScreen = require('./components/HomeScreen');
-var RoundHome = require('./components/RoundHome');
-var Question = require('./components/Question');
-var RoundIndex = require('./components/RoundIndex');
-var RoundExample = require('./components/RoundExample');
+var HomeScreen = require('./components/HomeScreen.react');
+var RoundHome = require('./components/RoundHome.react');
+var Question = require('./components/Question.react');
+var RoundIndex = require('./components/RoundIndex.react');
+var RoundExample = require('./components/RoundExample.react');
 
 ReactDOM.render((
   <Router>

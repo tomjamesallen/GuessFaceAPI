@@ -1,5 +1,5 @@
 var React = require('react');
-var QuestionsList = require('./parts/QuestionsList');
+var QuestionsList = require('./QuestionsList.react');
 
 var RoundIndex = React.createClass({
   

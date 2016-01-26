@@ -1,9 +1,9 @@
 var React = require('react');
 var Link = require('react-router').Link;
-var QuestionDisplay = require('./parts/QuestionDisplay');
-var PrevNext = require('./parts/PrevNext');
+var QuestionDisplay = require('./QuestionDisplay.react');
+var PrevNext = require('./PrevNext.react');
 var Lifecycle = require('react-router').Lifecycle;
-var QuestionRouterMixin = require('./mixins/QuestionRouterMixin');
+var QuestionRouterMixin = require('./mixins/QuestionRouterMixin.react');
 
 var Question = React.createClass({
 

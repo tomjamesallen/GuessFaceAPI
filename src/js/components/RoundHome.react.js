@@ -2,9 +2,9 @@ var React = require('react');
 var Link = require('react-router').Link;
 var _ = require('underscore');
 
-var Display = require('./parts/Display');
-var QuestionsList = require('./parts/QuestionsList');
-var QuestionDisplay = require('./parts/QuestionDisplay');
+var Display = require('./helpers/Display.react');
+var QuestionsList = require('./QuestionsList.react');
+var QuestionDisplay = require('./QuestionDisplay.react');
 
 var RoundHome = React.createClass({
 
