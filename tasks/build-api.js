@@ -5,6 +5,7 @@ var extend = require('extend');
 var im = require('imagemagick');
 var fs = require('fs');
 var _ = require('underscore');
+var jsonfile = require('jsonfile');
 
 // FS Helpers.
 fs.mkdirParent = require('./helpers/mkdirParent');
@@ -440,7 +441,6 @@ var createImageVariant = function (srcImg, outputDir, size) {
  * Save data to JSON.
  */
 var saveJsonApi = function (data) {
-  var jsonfile = require('jsonfile');
   var file = './dist/api/index.json';
   jsonfile.writeFileSync(file, data, {spaces: 2});
 };

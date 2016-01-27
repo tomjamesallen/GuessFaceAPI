@@ -1,7 +1,0 @@
-.bp-helper {
-  display: none;
-  content: 'mobile';
-  @include desktop {
-    content: 'desktop';
-  }
-}
