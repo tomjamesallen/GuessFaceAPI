@@ -13,7 +13,9 @@ fs.deleteFolderRecursive = require('./helpers/deleteFolderRecursive');
 
 // Var defaults object.
 var defaults = {
-  imageOutputDir : "dist/api/imgs",
+  apiOutputDir: './dist/api/',
+  imageOutputSubDir : 'imgs/',
+  apiPathPrefix: '/',
   imgSizes: [320, 640, 960],
   imgFormat: 'jpg',
   imThreadConcurrency: 50,
@@ -201,7 +203,7 @@ var createQuestionsImages = function (questionDir, questionDataTemp) {
   var questionDataTemp = _.clone(questionDataTemp);
 
   // The directory to save output images to.
-  var distDir = './' + config.imageOutputDir;
+  var distDir = config.apiOutputDir + config.imageOutputSubDir;
 
   // Prepend src/questions path to the questionDir.
   var questionImgDir = './src/questions/' + questionDir;
@@ -225,7 +227,7 @@ var createQuestionsImages = function (questionDir, questionDataTemp) {
     // Call function to create image variants. When it returns save imgsData to
     // questionData.
     createImageVariants(path, distDir, imgName, questionDataTemp.roundData.roundId, questionDataTemp.questionId).then(function (imgVariantsData) {
-      
+
       // Save the imgVariantData to tempImgsData, keyed by the imgName.
       tempImgsData[imgName] = imgVariantsData;
       // Resolve the imgReady promise.
@@ -282,8 +284,9 @@ var createImageVariants = function (imgPath, distDir, imgName, roundId, question
   };
 
   // Build outputDir using roundId and questionId.
-  var outputDir = distDir + '/' + 
-      'round-' + roundId + '/' + 
+  var outputDir = distDir + 
+      'round-' + roundId + 
+      '/' + 
       'question-' + questionId;
 
   // Create placeholder var for metadata.
@@ -395,7 +398,7 @@ var createImageVariant = function (srcImg, outputDir, size) {
 
     // Create output file name.
     var outputFileName = outputDir + '/' +
-        srcImg.imgName + '_' + size +
+        srcImg.imgName + '.' + size +
         '.' + config.imgFormat;
 
     threadManager_imResize.newThread(function (thread) {
@@ -416,13 +419,13 @@ var createImageVariant = function (srcImg, outputDir, size) {
         fs.writeFileSync(outputFileName, stdout, 'binary');
 
         // Get api file path.
-        var apiFilePath = outputFileName.split('dist/');
+        var apiFilePath = outputFileName.split(config.apiOutputDir);
         if (apiFilePath.length === 1) {
-          // Get filepath after dist/.
           apiFilePath = apiFilePath[0];
         }
         else {
-          apiFilePath = '/' + apiFilePath[1];
+          // Get filepath after `config.apiOutputDir`.
+          apiFilePath = config.apiPathPrefix + apiFilePath[1];
         }
 
         thread.resolve();
@@ -441,7 +444,7 @@ var createImageVariant = function (srcImg, outputDir, size) {
  * Save data to JSON.
  */
 var saveJsonApi = function (data) {
-  var file = './dist/api/index.json';
+  var file = config.apiOutputDir + 'index.json';
   jsonfile.writeFileSync(file, data, {spaces: 2});
 };
 
