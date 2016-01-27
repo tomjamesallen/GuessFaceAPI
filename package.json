@@ -6,6 +6,7 @@
   "author": "tom allen <tomjamesallenweb@gmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "cors": "^2.7.1",
     "extend": "^3.0.0",
     "gulp": "^3.9.0",
     "gulp-connect": "^2.3.1",
