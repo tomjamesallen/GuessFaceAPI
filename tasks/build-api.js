@@ -21,6 +21,12 @@ var defaults = {
   imThreadConcurrency: 50,
 };
 
+// Console colors.
+var cc = {
+  reset: "\x1b[0m",
+  fgGreen: "\x1b[32m"
+};
+
 // Get extend defaults with config in build-api-config.json.
 var config = extend({}, defaults, require('../build-api-config.json'));
 
@@ -34,6 +40,8 @@ var threadManager_imResize = require('./helpers/ThreadManager')(config.imThreadC
  * Generates JSON API and image variants.
  */
 var buildApiMaster = function () {
+
+  var taskComplete = Q.defer();
 
   // Require master question data file from src.
   var questionsData = require('../src/questions/index.json');
@@ -69,8 +77,11 @@ var buildApiMaster = function () {
   // JSON file.
   Q.allSettled(roundPromises).then(function () {
     saveJsonApi(apiData);
-    console.log('JSON saved to API.');
-  });  
+    console.log(cc.fgGreen, 'SUCCESS! JSON saved to API.', cc.reset);
+    taskComplete.resolve();
+  });
+
+  return taskComplete.promise;
 };
 
 /**
@@ -452,7 +463,7 @@ var saveJsonApi = function (data) {
  * Gulp task.
  */
 gulp.task('build-api', function () {
-  buildApiMaster();
+  return buildApiMaster();
 });
 
 // Export function for re-use.

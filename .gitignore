@@ -1,7 +1,14 @@
+# Exclude node modules.
 node_modules
-design
-# Excluding questions for development.
+
+# Exclude sublime project bits.
 *.sublime-project
 *.sublime-workspace
+
+# Exclude the input questions directory, with the exception of a placeholder. 
+src/questions/**
+!src/questions/.keep
+
+# Exclude output directory.
 dist
-src/questions
+
