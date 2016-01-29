@@ -1,3 +1,8 @@
+/**
+ * Dev server.
+ *
+ * Serves API directory.
+ */
 var gulp = require('gulp');
 var path = require('path');
 var connect = require('gulp-connect');

@@ -1,3 +1,45 @@
+/**
+ * Gulp build task.
+ *
+ * Gulp build task needs to perform the following:
+ * * Create image variants
+ * * Output JSON API with image data and answers.
+ * 
+ * Input / output directory structure is as follows:
+ * 
+ *     - src/
+ *       - questions/
+ *         - question-name/
+ *           - a.jpg
+ *           - b.jpg
+ *           - mix.jpg
+ *           - index.json
+ *     - dist/
+ *       - api/
+ *         - index.json
+ *         - imgs/
+ *           - round-0/
+ *             - question-0/
+ *               - index.json
+ *               - a/
+ *                 - r0q0.a.320.jpg
+ *                 - r0q0.a.640.jpg
+ *               - b/
+ *                 - r0q0.b.320.jpg
+ *                 - r0q0.b.640.jpg
+ *               - mix/
+ *                 - r0q0.mix.320.jpg
+ *                 - r0q0.mix.640.jpg               
+ *      
+ * We need to look at the rounds meta data for the order of the questions and
+ * then looks in the questions directory for the matching folder name. We then
+ * load up the meta data from the question and check for the necessary images.
+ * Images variants can then be created and placed in the `/dist/api/` directory.
+ * The image paths are saved and added to the data to be saved to
+ * `api/index.json`.
+ */
+
+
 // Require modules.
 var gulp = require('gulp');
 var Q = require('q');
@@ -11,7 +53,7 @@ var jsonfile = require('jsonfile');
 fs.mkdirParent = require('./helpers/mkdirParent');
 fs.deleteFolderRecursive = require('./helpers/deleteFolderRecursive');
 
-// Var defaults object.
+// Defaults object.
 var defaults = {
   apiOutputDir: './dist/api/',
   imageOutputSubDir : 'imgs/',
@@ -27,7 +69,7 @@ var cc = {
   fgGreen: "\x1b[32m"
 };
 
-// Get extend defaults with config in build-api-config.json.
+// Extend defaults with config in build-api-config.json.
 var config = extend({}, defaults, require('../build-api-config.json'));
 
 // Set up threadManager.
@@ -53,8 +95,8 @@ var buildApiMaster = function () {
   // Create empty array to store promises for round data.
   var roundPromises = [];
 
-  // Delete previous imgs folder.
-  fs.deleteFolderRecursive('./' + config.imageOutputDir, 'force');
+  // Delete previous dist folder.
+  fs.deleteFolderRecursive(config.apiOutputDir, 'force');
 
   // Cycle over rounds in questionsData.
   questionsData.forEach(function (roundDataTemp, i) {
@@ -365,7 +407,7 @@ var createImageVariants = function (imgPath, distDir, imgName, roundId, question
     config.imgSizes.forEach(function (size) {
 
       // Save the promise returned by createImageVariant.
-      var imageVariantPromise = createImageVariant(imgFileData, outputDir, size);
+      var imageVariantPromise = createImageVariant(imgFileData, outputDir, size, roundId, questionId);
       
       // Save data on promise returning. 
       imageVariantPromise.then(function (fileName) {
@@ -393,8 +435,8 @@ var createImageVariants = function (imgPath, distDir, imgName, roundId, question
  * Returns a promise.
  * @return promise
  */
-var createImageVariant = function (srcImg, outputDir, size) {
-  
+var createImageVariant = function (srcImg, outputDir, size, roundId, questionId) {
+
   // Create promise for variant.
   var variantProcessedPromise = Q.defer();
   
@@ -409,6 +451,8 @@ var createImageVariant = function (srcImg, outputDir, size) {
 
     // Create output file name.
     var outputFileName = outputDir + '/' +
+        'r' + roundId +
+        'q' + questionId + '.' +
         srcImg.imgName + '.' + size +
         '.' + config.imgFormat;
 
