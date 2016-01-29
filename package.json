@@ -1,8 +1,9 @@
 {
-  "name": "guess-face-2015",
-  "version": "1.0.0",
+  "name": "guessface-api",
+  "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "repository": "https://github.com/tomjamesallen/guessface-api",
+  "main": "gulpfile.js",
   "author": "tom allen <tomjamesallenweb@gmail.com>",
   "license": "ISC",
   "devDependencies": {
