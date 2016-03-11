@@ -1,4 +1,4 @@
 {
-  "__apiPathPrefix__": "//api.example.com/",
+  "apiPathPrefix": "//localhost:8777/",
   "__imThreadConcurrency__": 50
 }

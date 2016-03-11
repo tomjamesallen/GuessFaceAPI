@@ -89,7 +89,7 @@ var buildApiMaster = function () {
   var questionsData = require('../src/questions/index.json');
 
   var apiData = {
-    rounds: {}
+    rounds: []
   };
   
   // Create empty array to store promises for round data.
@@ -140,7 +140,7 @@ var processRound = function (roundData, i) {
   roundData.roundId = i;
 
   // Create an empty array for the questionsData.
-  roundData.questionsData = {};
+  roundData.questionsData = [];
 
   // Set initial questionId.
   var questionId = 0;
