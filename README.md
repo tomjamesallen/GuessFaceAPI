@@ -1,6 +1,6 @@
 # Guessface API
 
-This repository provides a gulp build task that will create a flat-file API for the Guessface front-end. 
+This repository provides a gulp build task that will create a flat-file API for the [Guessface front-end][guessface-app]. 
 
 Being flat-files means that it can be easily and cheaply deployed to any basic file server, such as Amazon S3 or GitHub pages. The build task takes the raw input data and images, and will create the image size variants, and a single JSON data file representing the data for each round and it's corresponding questions.
 
@@ -33,5 +33,6 @@ Please see [https://github.com/tomjamesallen/guessface-questions][guessface-ques
 
 Any of the properties found at the top of `/tasks/build-api.js` can be overridden in `/build-api-config.json`. There are a couple of examples in the file, just remove the `__` prefix and suffix from the key to enable. `apiPathPrefix` will determine the prefix given to the image paths in the output JSON. `imThreadConcurrency` determines the number of imagemagick threads that will be run concurrently. imagemagick can be a little processor hungry, so if you run into errors, the first thing to try is reducing the thread concurrency count.
 
+[guessface-app]: https://github.com/tomjamesallen/guessface-app
 [Homebrew]: http://brew.sh
 [guessface-questions]: https://github.com/tomjamesallen/guessface-questions
