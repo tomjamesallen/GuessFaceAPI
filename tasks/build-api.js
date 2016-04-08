@@ -60,7 +60,7 @@ var defaults = {
   apiPathPrefix: '/',
   imgSizes: [320, 640, 960],
   imgFormat: 'jpg',
-  imThreadConcurrency: 50,
+  imThreadConcurrency: 20,
 };
 
 // Console colors.
@@ -260,6 +260,8 @@ var createQuestionsImages = function (questionDir, questionDataTemp) {
 
   // Prepend src/questions path to the questionDir.
   var questionImgDir = './src/questions/' + questionDir;
+
+  console.log(`Started:   ${questionDir}`);
   
   // Create empty array for imgPromises.
   var imgPromises = [];
@@ -306,6 +308,8 @@ var createQuestionsImages = function (questionDir, questionDataTemp) {
         questionDataTemp.imgs[imgName] = tempImgsData[imgName];
       }
     });
+
+    console.log(`Completed: ${questionDir}`);
 
     // Once all data is saved, resolve the promise.
     allImgPromisesSettledPromise.resolve(questionDataTemp);
@@ -391,6 +395,12 @@ var createImageVariants = function (imgPath, distDir, imgName, roundId, question
   // On both PNG and JPG promises returning call function to create each of the
   // images variants.
   Q.allSettled([foundImgPromises['png'].promise, foundImgPromises['jpg'].promise]).then(function () {
+
+    if (!imgFileData.path) {
+      const err = new Error(`"${imgPath}" not found`);
+      console.log(err);
+      throw err;
+    }
     
     // Save useful metadata.
     if (imgFileData.metadata.height && imgFileData.metadata.width) {
